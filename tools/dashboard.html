@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salles Prospector — Prospecção Ativa (V.L.A.E.G.)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f8f8f6;
+      --surface: rgba(255, 255, 255, 0.78);
+      --surface-hover: #ffffff;
+      --surface-lilac: rgba(247, 243, 255, 0.82);
+      --ink: #242424;
+      --ink-title: #292929;
+      --muted: #5c5c5c;
+      --eyebrow: #6b6b6b;
+      --scribble: #767676;
+      --border: #e0e0dc;
+      --border-lilac: #d7c4f3;
+      --codex-purple: #7c5cff;
+      --codex-blue: #5f8cff;
+      --codex-lavender: #a78bfa;
+      --fio-purple: #8151d6;
+      --feature-dark-1: #17152a;
+      --feature-dark-2: #211d43;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 72px;
+      position: relative;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Grade sutil do modelo Qatchup */
+    .page-grid {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 920px;
+      opacity: 0.55;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(30, 30, 30, 0.042) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 30, 30, 0.042) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+    }
+
+    .content-width {
+      width: min(1080px, calc(100% - 44px));
+      margin-inline: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Topbar idêntica ao Hospedador / Qatchup */
+    .topbar {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(36, 36, 36, 0.1);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font: 700 13px/1 'Montserrat', sans-serif;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .brand-symbol {
+      width: 30px;
+      height: 23px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px 7px 7px 2px;
+      background: linear-gradient(135deg, #8b7cff 0%, #5f8cff 100%);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(95, 140, 255, 0.24);
+      font: 700 9px/1 'Montserrat', sans-serif;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 13px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.68);
+      color: #636363;
+      font: 600 11px/1 'Inter', sans-serif;
+    }
+
+    .status-chip i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--codex-purple);
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.22);
+    }
+
+    .btn-pill-soft {
+      padding: 9px 15px;
+      border-radius: 999px;
+      border: 0.8px solid #d7c4f3;
+      background: rgba(247, 243, 255, 0.9);
+      color: #5a3cc0;
+      font: 600 12px/1 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-pill-soft:hover {
+      background: #fbf9ff;
+      border-color: #b9a0ec;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Editorial com Caveat + Montserrat 700 */
+    .hero {
+      padding: 48px 0 30px;
+      text-align: left;
+    }
+
+    .scribble {
+      display: inline-block;
+      margin: 0 0 14px 2px;
+      color: var(--scribble);
+      font: 500 22px/1.1 'Caveat', cursive;
+      transform: rotate(-2deg);
+    }
+
+    .hero h1 {
+      margin: 0 0 14px;
+      font: 700 clamp(30px, 4.5vw, 44px)/1.05 'Montserrat', sans-serif;
+      letter-spacing: -0.065em;
+      color: var(--ink-title);
+      max-width: 760px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #7c5cff 0%, #5f8cff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font: 400 14px/1.5 'Inter', sans-serif;
+      color: #636363;
+      max-width: 620px;
+    }
+
+    /* Bloco Escuro de Destaque (idêntico ao .linkhub-feature #17152a -> #211d43) */
+    .feature-command {
+      margin: 10px 0 34px;
+      padding: 28px 30px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #17152a 0%, #211d43 100%);
+      color: #fff;
+      box-shadow: 0 18px 40px rgba(23, 21, 42, 0.16);
+      border: 1px solid rgba(167, 139, 250, 0.22);
+    }
+
+    .feature-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .feature-head .scribble {
+      color: #c4b5fd;
+      margin-bottom: 4px;
+      font-size: 20px;
+    }
+
+    .feature-head h2 {
+      font: 700 22px/1.1 'Montserrat', sans-serif;
+      letter-spacing: -0.055em;
+      color: #fff;
+    }
+
+    .command-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1.15fr 1fr 0.85fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    @media (max-width: 940px) { .command-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 540px) { .command-grid { grid-template-columns: 1fr; } }
+
+    .field-label {
+      display: block;
+      margin: 0 0 6px 2px;
+      font: 600 10px/1.2 'Inter', sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #bdb8dc;
+    }
+
+    .feature-input, .feature-select {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font: 500 13px/1.2 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .feature-select option {
+      background: #1b1736;
+      color: #fff;
+    }
+
+    .feature-input:focus, .feature-select:focus {
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.25);
+    }
+
+    /* Botão Codex Roxo->Azul com acabamento Puffy */
+    .btn-codex-primary {
+      padding: 14px 22px;
+      border-radius: 999px;
+      border: 0;
+      color: #fff;
+      font: 700 13px/1 'Montserrat', sans-serif;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #8b7cff 0%, #5f8cff 100%);
+      box-shadow:
+        inset 3px 3px 7px rgba(255, 255, 255, 0.38),
+        inset -4px -5px 9px rgba(60, 40, 160, 0.28),
+        0 8px 22px rgba(95, 140, 255, 0.35);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      white-space: nowrap;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-codex-primary:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 3px 3px 7px rgba(255, 255, 255, 0.45),
+        inset -4px -5px 9px rgba(60, 40, 160, 0.3),
+        0 12px 26px rgba(95, 140, 255, 0.45);
+    }
+
+    .subniche-bar {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .subniche-pill {
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #e4e0ff;
+      font: 600 11px/1 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .subniche-pill:hover {
+      background: rgba(139, 124, 255, 0.28);
+      border-color: #a78bfa;
+      color: #fff;
+    }
+
+    /* KPIs — Cards Qatchup com Caixa Lilás Puffy (.linkhub-icon-lilac) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+
+    @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .kpi-grid { grid-template-columns: 1fr; } }
+
+    .kpi-card {
+      padding: 16px;
+      border: 0.8px solid var(--border);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: 0 5px 16px rgba(50, 50, 50, 0.025);
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      background: #fff;
+      border-color: #d7c4f3;
+    }
+
+    .linkhub-icon-lilac {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #f5efff 0%, #e9dcff 100%);
+      border: 1px solid #d7c4f3;
+      box-shadow:
+        inset 3px 3px 7px rgba(255, 255, 255, 0.75),
+        inset -4px -5px 8px rgba(129, 81, 214, 0.14),
+        0 4px 10px rgba(129, 81, 214, 0.18);
+    }
+
+    .puffy-icon {
+      width: 34px;
+      height: 34px;
+      display: block;
+      overflow: visible;
+      filter: drop-shadow(0 2px 2px rgba(90, 60, 192, 0.28));
+    }
+
+    .kpi-copy span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--eyebrow);
+      font: 600 10px/1.1 'Inter', sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .kpi-copy strong {
+      display: block;
+      color: var(--ink-title);
+      font: 700 24px/1.05 'Montserrat', sans-serif;
+      letter-spacing: -0.055em;
+    }
+
+    .kpi-copy small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font: 500 11px/1.2 'Inter', sans-serif;
+    }
+
+    /* Cabeçalho da Lista & Filtros */
+    .section-header {
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #e5e5e0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .tabs-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      padding: 10px 15px;
+      border-radius: 12px;
+      border: 0.8px solid var(--border);
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--muted);
+      font: 600 12px/1 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background: #fbf9ff;
+      border-color: #d7c4f3;
+      color: var(--ink-title);
+    }
+
+    .tab-btn-active {
+      background: rgba(247, 243, 255, 0.95);
+      border-color: #b9a0ec;
+      color: #5a3cc0;
+    }
+
+    .filter-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .clean-input, .clean-select {
+      padding: 10px 13px;
+      border-radius: 12px;
+      border: 0.8px solid var(--border);
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--ink-title);
+      font: 500 12px/1.2 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .clean-input:focus, .clean-select:focus {
+      border-color: #b9a0ec;
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.14);
+    }
+
+    /* Grid de Cards de Leads (idêntico aos cards do Hospedador/Fio) */
+    .leads-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 820px) { .leads-grid { grid-template-columns: 1fr; } }
+
+    .lead-card {
+      padding: 20px;
+      border: 0.8px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 5px 16px rgba(50, 50, 50, 0.025);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .lead-card:hover {
+      transform: translateY(-2px);
+      background: #fff;
+      border-color: #d7c4f3;
+      box-shadow: 0 12px 25px rgba(50, 50, 50, 0.07);
+    }
+
+    .lead-card-priority {
+      background: rgba(247, 243, 255, 0.65);
+      border-color: #e5dafa;
+    }
+
+    .lead-card-priority:hover {
+      background: #fbf9ff;
+      border-color: #d7c4f3;
+    }
+
+    .badges-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill-non-advertiser {
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: rgba(247, 243, 255, 0.95);
+      border: 0.8px solid #d7c4f3;
+      color: #5a3cc0;
+      font: 600 11px/1 'Inter', sans-serif;
+    }
+
+    .pill-in-library {
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: #ececea;
+      border: 0.8px solid #d5d5d0;
+      color: #5c5c5c;
+      font: 600 11px/1 'Inter', sans-serif;
+    }
+
+    .pill-potential-high {
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #7c5cff 0%, #5f8cff 100%);
+      color: #fff;
+      font: 600 11px/1 'Inter', sans-serif;
+    }
+
+    .pill-potential-other {
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: #f2f2ef;
+      border: 0.8px solid #dcdcd6;
+      color: #5c5c5c;
+      font: 600 11px/1 'Inter', sans-serif;
+    }
+
+    .lead-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+    }
+
+    .lead-copy {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .lead-eyebrow {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--eyebrow);
+      font: 600 10px/1.2 'Inter', sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .lead-copy h3 {
+      margin: 0 0 4px;
+      color: var(--ink-title);
+      font: 700 18px/1.15 'Montserrat', sans-serif;
+      letter-spacing: -0.055em;
+    }
+
+    .lead-submeta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      color: var(--muted);
+      font: 500 12px/1.3 'Inter', sans-serif;
+    }
+
+    .lead-submeta a {
+      color: #5a3cc0;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .lead-bio {
+      padding: 11px 13px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 0.8px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      font: 400 12px/1.45 'Inter', sans-serif;
+      white-space: pre-line;
+    }
+
+    .lead-reason {
+      padding: 10px 13px;
+      background: rgba(247, 243, 255, 0.72);
+      border: 0.8px solid #e5dafa;
+      border-radius: 12px;
+      color: var(--ink-title);
+      font: 500 12px/1.4 'Inter', sans-serif;
+    }
+
+    .lead-reason span {
+      display: block;
+      font: 600 9px/1.2 'Inter', sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--eyebrow);
+      margin-bottom: 3px;
+    }
+
+    .lead-phone-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .lead-actions {
+      padding-top: 12px;
+      border-top: 1px solid #ecece8;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .btn-whatsapp-codex {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #8b7cff 0%, #5f8cff 100%);
+      box-shadow:
+        inset 3px 3px 6px rgba(255, 255, 255, 0.35),
+        inset -3px -4px 8px rgba(60, 40, 160, 0.25),
+        0 6px 16px rgba(95, 140, 255, 0.28);
+      color: #fff;
+      font: 700 12px/1 'Montserrat', sans-serif;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-whatsapp-codex:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Modal idêntico ao .quiz-dialog do Hospedador */
+    .quiz-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(27, 23, 54, 0.5);
+      backdrop-filter: blur(6px);
+    }
+
+    .quiz-dialog {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      padding: 28px 26px 24px;
+      background: #f8f8f6;
+      border: 0.8px solid #e0e0dc;
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(27, 23, 54, 0.35);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 120;
+      display: none;
+      padding: 13px 18px;
+      border-radius: 13px;
+      background: #17152a;
+      border: 1px solid rgba(167, 139, 250, 0.4);
+      color: #fff;
+      font: 600 12px/1.3 'Inter', sans-serif;
+      box-shadow: 0 14px 32px rgba(23, 21, 42, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid" aria-hidden="true"></div>
+
+  <div class="content-width">
+    <!-- Topbar -->
+    <header class="topbar">
+      <a href="#" class="brand-mark">
+        <span class="brand-symbol">IA</span>
+        <span>Salles Prospector • @sousalles.ia</span>
+      </a>
+
+      <div class="topbar-right">
+        <span class="status-chip">
+          <i></i>
+          MCP Apify Conectado
+        </span>
+        <span class="status-chip">
+          <i></i>
+          CRM DataCrazy Ativo
+        </span>
+        <button id="triggerStatusBtn" onclick="openTriggerModal()" class="btn-pill-soft">⚡ Gatilho: Manual</button>
+        <button onclick="openNewNicheModal()" class="btn-pill-soft">+ Novo Nicho</button>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <span class="scribble">Por onde começamos a prospecção hoje?</span>
+      <h1>Encontre empresas que ainda não anunciam e <em>feche pelo WhatsApp.</em></h1>
+      <p>
+        Pesquisa automática no Instagram pelo MCP da Apify, verificação na Biblioteca de Anúncios da Meta, cálculo de potencial de fechamento e envio direto para o seu CRM DataCrazy.
+      </p>
+    </section>
+
+    <!-- Bloco Escuro de Destaque (Feature Card Roxo Profundo Codex) -->
+    <section class="feature-command">
+      <div class="feature-head">
+        <div>
+          <span class="scribble">Nicho Automotivo & novos mercados</span>
+          <h2>Buscar leads qualificados no Instagram + Meta Ads</h2>
+        </div>
+        <label style="display:inline-flex;align-items:center;gap:8px;font:500 12px Inter,sans-serif;color:#ddd8ff;cursor:pointer;">
+          <input id="autoSendCheck" type="checkbox" checked style="width:16px;height:16px;accent-color:#7c5cff;" />
+          Enviar prioritários automaticamente ao DataCrazy
+        </label>
+      </div>
+
+      <div class="command-grid">
+        <div>
+          <label class="field-label">1. Escolher Nicho</label>
+          <select id="nicheSelect" onchange="onNicheChange()" class="feature-select"></select>
+        </div>
+
+        <div>
+          <label class="field-label">2. Termo de Busca</label>
+          <input id="keywordInput" type="text" placeholder="Ex: estetica automotiva" class="feature-input" />
+        </div>
+
+        <div>
+          <label class="field-label">3. Cidade / Estado</label>
+          <input id="locationInput" type="text" value="Brasil" placeholder="Ex: Belo Horizonte - MG" class="feature-input" />
+        </div>
+
+        <div>
+          <label class="field-label">4. Limite</label>
+          <select id="limitSelect" class="feature-select">
+            <option value="4">4 perfis (Rápido)</option>
+            <option value="8">8 perfis</option>
+            <option value="12">12 perfis</option>
+          </select>
+        </div>
+
+        <div>
+          <button id="prospectBtn" onclick="runLiveProspecting()" class="btn-codex-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <span>Prospectar Agora</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="subniche-bar">
+        <span style="font:600 11px Inter,sans-serif;color:#bdb8dc;margin-right:4px;">Atalhos Automotivos:</span>
+        <button onclick="quickSelectTerm('estetica automotiva')" class="subniche-pill">Estética Automotiva</button>
+        <button onclick="quickSelectTerm('polimento e vitrificacao')" class="subniche-pill">Vitrificação & PPF</button>
+        <button onclick="quickSelectTerm('seminovos multimarcas')" class="subniche-pill">Lojas de Seminovos</button>
+        <button onclick="quickSelectTerm('oficina mecanica especializada')" class="subniche-pill">Oficinas Mecânicas</button>
+        <button onclick="quickSelectTerm('insulfilm som automotivo')" class="subniche-pill">Insulfilm & Som</button>
+      </div>
+    </section>
+
+    <!-- KPIs com Ícones Puffy 3D (Roxo/Azul Codex sobre caixa lilás) -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="linkhub-icon-lilac" aria-hidden="true">
+          <!-- Puffy 3D Target SVG -->
+          <svg class="puffy-icon" viewBox="0 0 48 48">
+            <defs>
+              <linearGradient id="puffy-grad-1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#a78bfa" />
+                <stop offset="1" stop-color="#6d4fd8" />
+              </linearGradient>
+            </defs>
+            <circle cx="24" cy="24" r="15" fill="url(#puffy-grad-1)" stroke="#5a3cc0" stroke-width="3" />
+            <circle cx="24" cy="24" r="8" fill="#fff" opacity="0.92" />
+            <circle cx="24" cy="24" r="3.5" fill="#5a3cc0" />
+            <ellipse cx="18" cy="15" rx="4.5" ry="1.8" transform="rotate(-24 18 15)" fill="#fff" opacity="0.55" />
+          </svg>
+        </div>
+        <div class="kpi-copy">
+          <span>Prioridade Alta</span>
+          <strong id="kpiNonAdvertisers">0</strong>
+          <small>Não estão na Biblioteca</small>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="linkhub-icon-lilac" aria-hidden="true">
+          <!-- Puffy 3D Spark/Potential SVG -->
+          <svg class="puffy-icon" viewBox="0 0 48 48">
+            <defs>
+              <linearGradient id="puffy-grad-2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#7c5cff" />
+                <stop offset="1" stop-color="#5a3cc0" />
+              </linearGradient>
+            </defs>
+            <path d="M26 8 L13 26 H24 L22 40 L35 22 H24 Z" fill="url(#puffy-grad-2)" stroke="#5a3cc0" stroke-width="3" stroke-linejoin="round" />
+            <ellipse cx="22" cy="16" rx="3.5" ry="1.4" transform="rotate(-28 22 16)" fill="#fff" opacity="0.55" />
+          </svg>
+        </div>
+        <div class="kpi-copy">
+          <span>Alto Potencial</span>
+          <strong id="kpiHighPotential">0</strong>
+          <small>Prontos para fechamento</small>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="linkhub-icon-lilac" aria-hidden="true">
+          <!-- Puffy 3D Building/Library SVG -->
+          <svg class="puffy-icon" viewBox="0 0 48 48">
+            <defs>
+              <linearGradient id="puffy-building" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#b4c0ff" />
+                <stop offset="1" stop-color="#5f8cff" />
+              </linearGradient>
+            </defs>
+            <rect x="11" y="9" width="26" height="31" rx="6" fill="url(#puffy-building)" stroke="#5f8cff" stroke-width="3" stroke-linejoin="round" />
+            <rect x="16" y="15" width="6" height="6" rx="2.2" fill="#fff" opacity=".9" />
+            <rect x="26" y="15" width="6" height="6" rx="2.2" fill="#fff" opacity=".9" />
+            <rect x="16" y="24" width="6" height="6" rx="2.2" fill="#fff" opacity=".9" />
+            <rect x="26" y="24" width="6" height="6" rx="2.2" fill="#fff" opacity=".9" />
+            <rect x="20.5" y="32" width="7" height="8" rx="3" fill="#7c5cff" />
+            <ellipse cx="17" cy="11.8" rx="4.5" ry="1.8" transform="rotate(-12 17 11.8)" fill="#fff" opacity="0.55" />
+          </svg>
+        </div>
+        <div class="kpi-copy">
+          <span>Está na Biblioteca</span>
+          <strong id="kpiInLibrary">0</strong>
+          <small>Não prioritários inicialmente</small>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="linkhub-icon-lilac" aria-hidden="true">
+          <!-- Puffy 3D Check/CRM SVG -->
+          <svg class="puffy-icon" viewBox="0 0 48 48">
+            <rect x="10" y="10" width="28" height="28" rx="9" fill="url(#puffy-grad-1)" stroke="#5a3cc0" stroke-width="3" />
+            <path d="M17 24.5 L22 29.5 L31 19.5" fill="none" stroke="#fff" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" />
+            <ellipse cx="17" cy="14" rx="4.5" ry="1.6" transform="rotate(-18 17 14)" fill="#fff" opacity="0.55" />
+          </svg>
+        </div>
+        <div class="kpi-copy">
+          <span>No CRM DataCrazy</span>
+          <strong id="kpiSyncedDataCrazy">0</strong>
+          <small><a href="javascript:void(0)" onclick="syncAllHighPriorityToDataCrazy()" style="color:#5a3cc0;font-weight:600;text-decoration:underline;">Enviar pendentes</a></small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Banner de Busca Ativa -->
+    <div id="loadingBanner" style="display:none;margin-bottom:22px;padding:22px;border-radius:16px;background:linear-gradient(135deg,#17152a 0%,#211d43 100%);color:#fff;text-align:center;">
+      <p style="font:700 15px Montserrat,sans-serif;color:#c4b5fd;margin-bottom:6px;">Pesquisando perfis no Instagram e consultando a Biblioteca da Meta...</p>
+      <p style="font:400 12px Inter,sans-serif;color:#bdb8dc;">Aguarde de 15 a 25 segundos enquanto a Apify valida os anúncios ativos de cada empresa.</p>
+    </div>
+
+    <!-- Cabeçalho da Fila de Leads -->
+    <section class="section-header">
+      <div>
+        <span class="scribble">Leads qualificados para abordagem</span>
+        <div class="tabs-group">
+          <button id="tab_prioridade_alta" onclick="setFilterTab('prioridade_alta')" class="tab-btn tab-btn-active">
+            Prioridade Alta: Não Anunciam
+          </button>
+          <button id="tab_todos" onclick="setFilterTab('todos')" class="tab-btn">
+            Todos os Leads
+          </button>
+          <button id="tab_na_biblioteca" onclick="setFilterTab('na_biblioteca')" class="tab-btn">
+            Está na Biblioteca (Não Prioritários Inicialmente)
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-controls">
+        <select id="nicheFilterSelect" onchange="renderLeads()" class="clean-select">
+          <option value="ALL">Todos os Nichos</option>
+        </select>
+        <input id="searchFilterInput" oninput="renderLeads()" type="text" placeholder="Buscar por nome, @ ou cidade..." class="clean-input" style="width:220px;" />
+      </div>
+    </section>
+
+    <!-- Grid de Leads -->
+    <section id="leadsGrid" class="leads-grid"></section>
+  </div>
+
+  <!-- Modal Novo Nicho (Estilo Quiz Dialog do Hospedador) -->
+  <div id="newNicheModal" class="quiz-overlay">
+    <div class="quiz-dialog">
+      <span class="scribble">Expandir operação</span>
+      <h3 style="margin:0 0 18px;font:700 22px/1.1 Montserrat,sans-serif;letter-spacing:-0.06em;color:#292929;">
+        Cadastrar novo <em>nicho de busca</em>
+      </h3>
+
+      <div style="display:grid;gap:12px;">
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Nome do Nicho</span>
+          <input id="modalNicheName" type="text" placeholder="Ex: Blindagem Automotiva" class="clean-input" style="width:100%;" />
+        </label>
+
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Palavras-chave (separadas por vírgula)</span>
+          <input id="modalNicheKeywords" type="text" placeholder="Ex: blindagem automotiva, carros blindados" class="clean-input" style="width:100%;" />
+        </label>
+
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Mensagem pronta para o WhatsApp</span>
+          <textarea id="modalNicheMessage" rows="4" class="clean-input" style="width:100%;">Olá, {nome}! Vi o perfil @{username} no Instagram e notei na Biblioteca de Anúncios da Meta que vocês não estão com campanhas ativas hoje. Posso te mostrar como geramos clientes diários pelo WhatsApp?</textarea>
+        </label>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+        <button onclick="closeNewNicheModal()" class="tab-btn">Cancelar</button>
+        <button onclick="saveNewNiche()" class="btn-codex-primary" style="padding:11px 18px;">Salvar Nicho</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Fase 5: Gatilho Automático (Piloto Automático) -->
+  <div id="triggerModal" class="quiz-overlay">
+    <div class="quiz-dialog">
+      <span class="scribble">Fase 5 • Gatilho V.L.A.E.G.</span>
+      <h3 style="margin:0 0 8px;font:700 22px/1.1 Montserrat,sans-serif;letter-spacing:-0.06em;color:#292929;">
+        Piloto Automático de <em>Prospecção</em>
+      </h3>
+      <p style="margin:0 0 16px;font:400 12px/1.45 Inter,sans-serif;color:#5c5c5c;">
+        Programe o sistema para rodar sozinho em segundo plano, filtrar os perfis válidos da cidade, extrair WhatsApps dos Linktrees e enviar os leads que não anunciam direto para o seu CRM DataCrazy.
+      </p>
+
+      <div style="display:grid;gap:12px;">
+        <label style="display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:12px;background:#f5efff;border:1px solid #d7c4f3;cursor:pointer;">
+          <input id="trigEnabled" type="checkbox" style="width:17px;height:17px;accent-color:#7c5cff;" />
+          <span style="font:600 12px Inter,sans-serif;color:#292929;">Ativar Gatilho Recorrente em Segundo Plano</span>
+        </label>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Intervalo de Execução</span>
+            <select id="trigInterval" class="clean-select" style="width:100%;">
+              <option value="6">A cada 6 horas</option>
+              <option value="12">A cada 12 horas</option>
+              <option value="24">A cada 24 horas (Diário)</option>
+            </select>
+          </label>
+
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Leads por Rodada</span>
+            <select id="trigLimit" class="clean-select" style="width:100%;">
+              <option value="4">4 leads</option>
+              <option value="6">6 leads</option>
+              <option value="10">10 leads</option>
+            </select>
+          </label>
+        </div>
+
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Termo de Busca Automática</span>
+          <input id="trigKeyword" type="text" placeholder="Ex: seminovos" class="clean-input" style="width:100%;" />
+        </label>
+
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Cidade / Região Alvo</span>
+          <input id="trigLocation" type="text" placeholder="Ex: Petrolina - PE" class="clean-input" style="width:100%;" />
+        </label>
+
+        <label style="display:flex;align-items:center;gap:8px;font:500 12px Inter,sans-serif;color:#292929;cursor:pointer;">
+          <input id="trigAutoDataCrazy" type="checkbox" checked style="width:16px;height:16px;accent-color:#7c5cff;" />
+          Enviar leads de Prioridade Alta direto para o CRM DataCrazy
+        </label>
+
+        <div id="trigNextRunInfo" style="padding:9px 12px;border-radius:10px;background:#fff;border:0.8px solid #e0e0dc;font:500 11px Inter,sans-serif;color:#5c5c5c;">
+          Status: Aguardando ativação.
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+        <button onclick="closeTriggerModal()" class="tab-btn">Fechar</button>
+        <button onclick="saveTriggerConfig()" class="btn-codex-primary" style="padding:11px 18px;">Salvar Gatilho</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let STATE = { leads: [], history: [], config: { niches: [], selectedNicheId: '' } };
+    let ACTIVE_TAB = 'prioridade_alta';
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    async function fetchState() {
+      const res = await fetch('/api/state');
+      STATE = await res.json();
+      populateNiches();
+      updateTriggerBadge();
+      renderKPIs();
+      renderLeads();
+    }
+
+    function updateTriggerBadge() {
+      const btn = document.getElementById('triggerStatusBtn');
+      const trig = STATE.config && STATE.config.trigger;
+      if (!btn || !trig) return;
+      if (trig.enabled) {
+        btn.textContent = `⚡ Gatilho Ativo (${trig.intervalHours}h • ${trig.location})`;
+        btn.style.background = '#f5efff';
+        btn.style.borderColor = '#7c5cff';
+        btn.style.color = '#5a3cc0';
+      } else {
+        btn.textContent = '⚡ Gatilho: Manual';
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }
+    }
+
+    function openTriggerModal() {
+      const trig = (STATE.config && STATE.config.trigger) || {};
+      document.getElementById('trigEnabled').checked = Boolean(trig.enabled);
+      document.getElementById('trigInterval').value = String(trig.intervalHours || 24);
+      document.getElementById('trigLimit').value = String(trig.limit || 6);
+      document.getElementById('trigKeyword').value = trig.keyword || document.getElementById('keywordInput').value || 'seminovos';
+      document.getElementById('trigLocation').value = trig.location || document.getElementById('locationInput').value || 'Petrolina - PE';
+      document.getElementById('trigAutoDataCrazy').checked = trig.autoSendDataCrazy !== false;
+      const info = document.getElementById('trigNextRunInfo');
+      if (trig.enabled && trig.nextRunAt) {
+        info.textContent = `Próxima execução automática agendada para: ${new Date(trig.nextRunAt).toLocaleString('pt-BR')}`;
+      } else {
+        info.textContent = 'Status: Modo manual (ative a caixa acima para rodar no piloto automático).';
+      }
+      document.getElementById('triggerModal').style.display = 'flex';
+    }
+
+    function closeTriggerModal() {
+      document.getElementById('triggerModal').style.display = 'none';
+    }
+
+    async function saveTriggerConfig() {
+      const enabled = document.getElementById('trigEnabled').checked;
+      const intervalHours = Number(document.getElementById('trigInterval').value);
+      const limit = Number(document.getElementById('trigLimit').value);
+      const keyword = document.getElementById('trigKeyword').value.trim();
+      const location = document.getElementById('trigLocation').value.trim();
+      const autoSendDataCrazy = document.getElementById('trigAutoDataCrazy').checked;
+      const nicheId = document.getElementById('nicheSelect').value;
+
+      const res = await fetch('/api/trigger/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled, intervalHours, limit, keyword, location, autoSendDataCrazy, nicheId })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        STATE.config = data.config;
+        updateTriggerBadge();
+        closeTriggerModal();
+        showToast(enabled ? `Piloto Automático ativado! Rodará a cada ${intervalHours}h em ${location}.` : 'Gatilho automático desativado (Modo Manual).');
+      }
+    }
+
+    function populateNiches() {
+      const sel = document.getElementById('nicheSelect');
+      const filterSel = document.getElementById('nicheFilterSelect');
+      const currentFilter = filterSel.value || 'ALL';
+
+      sel.innerHTML = '';
+      filterSel.innerHTML = '<option value="ALL">Todos os Nichos</option>';
+
+      for (const n of STATE.config.niches || []) {
+        const opt = document.createElement('option');
+        opt.value = n.id;
+        opt.textContent = `${n.category ? '[' + n.category + '] ' : ''}${n.name}`;
+        if (n.id === STATE.config.selectedNicheId) opt.selected = true;
+        sel.appendChild(opt);
+
+        const fOpt = document.createElement('option');
+        fOpt.value = n.id;
+        fOpt.textContent = n.name;
+        if (n.id === currentFilter) fOpt.selected = true;
+        filterSel.appendChild(fOpt);
+      }
+
+      onNicheChange();
+    }
+
+    function onNicheChange() {
+      const selId = document.getElementById('nicheSelect').value;
+      const niche = (STATE.config.niches || []).find((n) => n.id === selId);
+      if (niche && niche.keywords && niche.keywords.length > 0) {
+        document.getElementById('keywordInput').value = niche.keywords[0];
+      }
+    }
+
+    function quickSelectTerm(term) {
+      document.getElementById('keywordInput').value = term;
+    }
+
+    function setFilterTab(tab) {
+      ACTIVE_TAB = tab;
+      const tabs = ['prioridade_alta', 'todos', 'na_biblioteca'];
+      for (const t of tabs) {
+        const btn = document.getElementById(`tab_${t}`);
+        btn.className = t === tab ? 'tab-btn tab-btn-active' : 'tab-btn';
+      }
+      renderLeads();
+    }
+
+    function renderKPIs() {
+      const leads = STATE.leads || [];
+      document.getElementById('kpiNonAdvertisers').textContent = leads.filter((l) => !l.meta_ads.in_ad_library).length;
+      document.getElementById('kpiHighPotential').textContent = leads.filter((l) => l.qualification.closing_potential === 'ALTO').length;
+      document.getElementById('kpiInLibrary').textContent = leads.filter((l) => l.meta_ads.in_ad_library).length;
+      document.getElementById('kpiSyncedDataCrazy').textContent = leads.filter((l) => l.contact.datacrazy_synced).length;
+    }
+
+    function renderLeads() {
+      const grid = document.getElementById('leadsGrid');
+      const nicheFilter = document.getElementById('nicheFilterSelect').value;
+      const searchQ = document.getElementById('searchFilterInput').value.toLowerCase().trim();
+
+      let list = [...(STATE.leads || [])];
+
+      if (ACTIVE_TAB === 'prioridade_alta') {
+        list = list.filter((l) => !l.meta_ads.in_ad_library);
+      } else if (ACTIVE_TAB === 'na_biblioteca') {
+        list = list.filter((l) => l.meta_ads.in_ad_library);
+      }
+
+      if (nicheFilter && nicheFilter !== 'ALL') {
+        list = list.filter((l) => l.niche_id === nicheFilter);
+      }
+
+      if (searchQ) {
+        list = list.filter((l) =>
+          l.instagram.full_name.toLowerCase().includes(searchQ) ||
+          l.instagram.username.toLowerCase().includes(searchQ) ||
+          (l.location || '').toLowerCase().includes(searchQ) ||
+          (l.instagram.biography || '').toLowerCase().includes(searchQ)
+        );
+      }
+
+      list.sort((a, b) => (b.qualification.closing_score || 0) - (a.qualification.closing_score || 0));
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1;padding:42px;text-align:center;background:rgba(255,255,255,0.75);border:0.8px solid #e0e0dc;border-radius:14px;color:#5c5c5c;">
+            Nenhum lead neste filtro. Use o painel acima e clique em <b>"Prospectar Agora"</b>!
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map((lead) => {
+        const inLib = lead.meta_ads.in_ad_library;
+        const pot = lead.qualification.closing_potential;
+        const hasWa = Boolean(lead.contact.whatsapp_number);
+
+        const libPill = inLib
+          ? `<span class="pill-in-library">Está na Biblioteca (${lead.meta_ads.active_ads_count} anúncios) • Não Prioritário Inicialmente</span>`
+          : `<span class="pill-non-advertiser">Não está na Biblioteca • Prioridade Alta</span>`;
+
+        const potPill = pot === 'ALTO'
+          ? `<span class="pill-potential-high">Potencial de Fechamento: ALTO (${lead.qualification.closing_score} pts)</span>`
+          : `<span class="pill-potential-other">Potencial: ${pot} (${lead.qualification.closing_score} pts)</span>`;
+
+        const dcTag = lead.contact.datacrazy_synced
+          ? `<span style="padding:3px 8px;border-radius:999px;background:rgba(124,92,255,0.14);color:#5a3cc0;font:600 10px Inter,sans-serif;">No DataCrazy</span>`
+          : '';
+
+        return `
+          <article class="lead-card ${!inLib && pot === 'ALTO' ? 'lead-card-priority' : ''}">
+            <div style="display:grid;gap:12px;">
+              <div class="badges-line">
+                ${libPill}
+                ${potPill}
+              </div>
+
+              <div class="lead-top">
+                <div class="linkhub-icon-lilac" aria-hidden="true">
+                  <svg class="puffy-icon" viewBox="0 0 48 48">
+                    <rect x="11" y="10" width="26" height="29" rx="7" fill="url(#puffy-building)" stroke="#5f8cff" stroke-width="3" />
+                    <rect x="16" y="16" width="6" height="6" rx="2" fill="#fff" opacity=".9" />
+                    <rect x="26" y="16" width="6" height="6" rx="2" fill="#fff" opacity=".9" />
+                    <rect x="20.5" y="29" width="7" height="10" rx="3" fill="#7c5cff" />
+                  </svg>
+                </div>
+
+                <div class="lead-copy">
+                  <span class="lead-eyebrow">${lead.niche_name} • ${lead.location || 'Brasil'}</span>
+                  <h3>${lead.instagram.full_name}</h3>
+                  <div class="lead-submeta">
+                    <a href="${lead.instagram.profile_url}" target="_blank">@${lead.instagram.username} ↗</a>
+                    <span>•</span>
+                    <span>${Number(lead.instagram.followers_count || 0).toLocaleString('pt-BR')} seguidores</span>
+                    ${dcTag}
+                  </div>
+                </div>
+              </div>
+
+              <p class="lead-bio">${lead.instagram.biography || 'Sem descrição na biografia.'}</p>
+
+              <div class="lead-reason">
+                <span>Diagnóstico de Fechamento</span>
+                <strong>${lead.qualification.closing_reason}</strong>
+              </div>
+
+              <!-- Bloco da 1ª Mensagem Recomendada por Caso -->
+              <div style="padding:12px 13px;background:#fff;border:0.8px solid #d7c4f3;border-radius:12px;display:grid;gap:8px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <span style="font:700 11px/1.2 Montserrat,sans-serif;color:#5a3cc0;">
+                    ${(lead.message_strategy && lead.message_strategy.case_title) || '1ª Mensagem Recomendada'}
+                  </span>
+                  <button
+                    type="button"
+                    onclick="copyLeadMessage('${lead.id}')"
+                    class="btn-pill-soft"
+                    style="padding:4px 10px;font-size:10px;"
+                  >
+                    Copiar 1ª Mensagem
+                  </button>
+                </div>
+                <p style="font:400 11px/1.35 Inter,sans-serif;color:#636363;">
+                  ${(lead.message_strategy && lead.message_strategy.strategy_reason) || ''}
+                </p>
+                <textarea
+                  id="msg_${lead.id}"
+                  rows="3"
+                  onchange="updateLeadMessage('${lead.id}', this.value)"
+                  class="clean-input"
+                  style="width:100%;font:500 12px/1.4 Inter,sans-serif;color:#242424;background:rgba(247,243,255,0.45);resize:vertical;"
+                >${lead.contact.personalized_message || ''}</textarea>
+                ${(lead.message_strategy && lead.message_strategy.second_message_hint)
+                  ? `<div style="padding:8px 10px;border-radius:9px;background:#f8f8f6;border:1px dashed #d7c4f3;font:500 11px/1.35 Inter,sans-serif;color:#5c5c5c;">
+                      <strong style="color:#5a3cc0;">Passo 2 (depois que responder):</strong> ${lead.message_strategy.second_message_hint}
+                    </div>`
+                  : ''}
+              </div>
+
+              <div class="lead-phone-row">
+                <span style="font:600 11px Inter,sans-serif;color:#636363;">WhatsApp:</span>
+                <input
+                  type="text"
+                  value="${lead.contact.whatsapp_number || ''}"
+                  placeholder="Ex: 5531999999999"
+                  onchange="updateLeadPhone('${lead.id}', this.value)"
+                  class="clean-input"
+                  style="flex:1;padding:8px 11px;"
+                />
+                <a href="${lead.meta_ads.ad_library_url}" target="_blank" class="btn-pill-soft" style="text-decoration:none;padding:8px 12px;font-size:11px;">
+                  Biblioteca Meta ↗
+                </a>
+              </div>
+            </div>
+
+            <div class="lead-actions">
+              <a
+                href="${lead.contact.whatsapp_link}"
+                target="_blank"
+                onclick="markLeadContacted('${lead.id}')"
+                class="btn-whatsapp-codex"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>${hasWa ? 'Chamar no WhatsApp' : 'Abordar no Instagram'}</span>
+              </a>
+
+              <button onclick="sendSingleToDataCrazy('${lead.id}')" class="btn-pill-soft" style="padding:11px 15px;">
+                ${lead.contact.datacrazy_synced ? 'Reenviar ao DataCrazy' : 'Enviar p/ DataCrazy'}
+              </button>
+
+              <button
+                type="button"
+                onclick="deleteLead('${lead.id}', '${lead.instagram.username}')"
+                title="Apagar lead inexistente ou descartado"
+                class="btn-pill-soft"
+                style="padding:11px 13px;color:#b42318;border-color:#fecdca;background:#fff5f5;display:inline-flex;align-items:center;gap:5px;"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                <span>Apagar</span>
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    async function runLiveProspecting() {
+      const nicheId = document.getElementById('nicheSelect').value;
+      const keyword = document.getElementById('keywordInput').value;
+      const location = document.getElementById('locationInput').value;
+      const limit = Number(document.getElementById('limitSelect').value);
+      const autoSendDataCrazy = document.getElementById('autoSendCheck').checked;
+
+      const btn = document.getElementById('prospectBtn');
+      const banner = document.getElementById('loadingBanner');
+      btn.disabled = true;
+      banner.style.display = 'block';
+
+      try {
+        const res = await fetch('/api/prospect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nicheId, keyword, location, limit, autoSendDataCrazy })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          showToast('Erro na busca: ' + (data.error || 'Verifique a conexão'));
+        } else {
+          STATE.leads = data.leads;
+          STATE.history = data.history;
+          renderKPIs();
+          renderLeads();
+          showToast(`${data.newLeadsCount} perfis analisados no Instagram e verificados na Biblioteca da Meta!`);
+        }
+      } catch (e) {
+        showToast('Erro ao consultar servidor: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        banner.style.display = 'none';
+      }
+    }
+
+    async function sendSingleToDataCrazy(leadId) {
+      showToast('Enviando lead para o CRM DataCrazy...');
+      const res = await fetch('/api/datacrazy/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadId })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        STATE.leads = data.leads;
+        renderKPIs();
+        renderLeads();
+        showToast('Lead enviado com sucesso para o seu CRM DataCrazy!');
+      } else {
+        showToast('Erro DataCrazy: ' + data.error);
+      }
+    }
+
+    async function syncAllHighPriorityToDataCrazy() {
+      const pending = (STATE.leads || []).filter((l) => !l.meta_ads.in_ad_library && !l.contact.datacrazy_synced);
+      if (pending.length === 0) {
+        showToast('Todos os leads de Prioridade Alta já foram enviados ao DataCrazy!');
+        return;
+      }
+      showToast(`Enviando ${pending.length} leads prioritários para o DataCrazy...`);
+      const res = await fetch('/api/datacrazy/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadIds: pending.map((p) => p.id) })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        STATE.leads = data.leads;
+        renderKPIs();
+        renderLeads();
+        showToast(`${data.syncedCount} leads enviados ao CRM DataCrazy!`);
+      }
+    }
+
+    async function updateLeadPhone(leadId, phoneVal) {
+      const res = await fetch(`/api/leads/${encodeURIComponent(leadId)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ whatsapp_number: phoneVal })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        STATE.leads = data.leads;
+        renderKPIs();
+        renderLeads();
+        showToast('WhatsApp atualizado e 1ª mensagem recalculada para o novo caso!');
+      }
+    }
+
+    async function updateLeadMessage(leadId, msgVal) {
+      const res = await fetch(`/api/leads/${encodeURIComponent(leadId)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ personalized_message: msgVal })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        STATE.leads = data.leads;
+        renderLeads();
+        showToast('1ª mensagem personalizada salva no botão do WhatsApp!');
+      }
+    }
+
+    function copyLeadMessage(leadId) {
+      const el = document.getElementById(`msg_${leadId}`);
+      if (!el) return;
+      navigator.clipboard.writeText(el.value);
+      showToast('1ª mensagem copiada para a área de transferência!');
+    }
+
+    async function markLeadContacted(leadId) {
+      await fetch(`/api/leads/${encodeURIComponent(leadId)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pipeline_status: 'chamado_whatsapp' })
+      });
+    }
+
+    async function deleteLead(leadId, username) {
+      try {
+        const res = await fetch(`/api/leads/${encodeURIComponent(leadId)}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.ok) {
+          STATE.leads = data.leads;
+          renderKPIs();
+          renderLeads();
+          showToast(`Lead @${username} apagado e bloqueado para não voltar em buscas futuras!`);
+        } else {
+          showToast('Erro ao apagar lead: ' + (data.error || 'Tente novamente'));
+        }
+      } catch (e) {
+        showToast('Erro ao apagar lead: ' + e.message);
+      }
+    }
+
+    function openNewNicheModal() {
+      document.getElementById('newNicheModal').style.display = 'flex';
+    }
+
+    function closeNewNicheModal() {
+      document.getElementById('newNicheModal').style.display = 'none';
+    }
+
+    async function saveNewNiche() {
+      const name = document.getElementById('modalNicheName').value.trim();
+      const keywords = document.getElementById('modalNicheKeywords').value.trim();
+      const defaultMessage = document.getElementById('modalNicheMessage').value.trim();
+      if (!name) return showToast('Informe o nome do nicho!');
+
+      const res = await fetch('/api/niches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category: 'Personalizado', keywords, defaultMessage })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        STATE.config = data.config;
+        populateNiches();
+        closeNewNicheModal();
+        showToast(`Nicho "${name}" adicionado!`);
+      }
+    }
+
+    fetchState();
+  </script>
+</body>
+</html>

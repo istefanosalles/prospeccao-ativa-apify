@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 60,
+      "includeFiles": "{tools/**,.tmp/leads_database.json}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.mjs"
+    }
+  ]
+}

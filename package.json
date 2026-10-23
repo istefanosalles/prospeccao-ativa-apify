@@ -1,0 +1,9 @@
+{
+  "name": "prospeccao-ativa-apify",
+  "version": "1.0.0",
+  "description": "Sistema de Prospecção Ativa V.L.A.E.G. — Instagram (Apify) + Meta Ads Library + CRM DataCrazy",
+  "type": "module",
+  "scripts": {
+    "start": "node tools/server.mjs"
+  }
+}

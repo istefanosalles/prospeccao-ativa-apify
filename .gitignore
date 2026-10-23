@@ -1,0 +1,7 @@
+.env
+.env.*
+node_modules/
+.vercel/
+.tmp/last_ig_search.json
+.tmp/last_meta_ads_check.json
+.tmp/test_ig_profiles.json
