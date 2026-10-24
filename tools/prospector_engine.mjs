@@ -96,18 +96,14 @@ export function generateFirstMessageStrategy({
 
   // CASO 1: NÃO anuncia na Biblioteca da Meta + Tem WhatsApp Direto
   if (!inAdLibrary && hasWa) {
-    const firstMsg = isCarDealer
-      ? `Opa, tudo bom? Peguei o contato de vocês lá no Instagram. Quem aí da loja cuida dessa parte comercial/marketing pra eu falar rapidinho?`
-      : isClinic
-      ? `Opa, tudo bom? Peguei o WhatsApp de vocês lá no Instagram. Quem aí da clínica cuida da parte comercial/captação de pacientes pra eu falar rapidinho?`
-      : `Opa, tudo bom? Peguei o WhatsApp de vocês lá no Instagram. É você mesmo que é o responsável aí ${placeWord} ou é da equipe de atendimento?`;
+    const firstMsg = `Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil de vocês e percebi alguns pontos estratégicos que podemos melhorar. Hoje você já tem alguma empresa que cuida do seu posicionamento digital?`;
 
-    const secondMsg = `Perguntei porque trabalho ajudando empresas ${sectorWord} a puxar cliente todo dia pelo Instagram, e vi que vocês não estão com nenhum anúncio ativo hoje. Posso te mandar um áudio de 30 segundos te explicando?`;
+    const secondMsg = `Perfeito! Na análise que fiz, reparei que vocês têm uma ótima estrutura, mas não estão com campanhas ativas hoje pra trazer clientes novos todo dia pro WhatsApp. Posso te mandar um áudio rápido de 30 segundos explicando os pontos que levantei?`;
 
     return {
       case_code: 'CASO_1_NAO_ANUNCIA_COM_WHATSAPP',
       case_title: 'Caso 1 • Não Anuncia + Tem WhatsApp',
-      strategy_reason: 'Sem cara de robô: faz a pessoa responder primeiro se é o dono/responsável antes de falar de tráfego.',
+      strategy_reason: 'Abordagem consultiva Salles (Front Work): gera autoridade com a análise prévia do perfil e abre conversa perguntando sobre o posicionamento digital.',
       recommended_channel: 'WhatsApp Direto',
       first_message: firstMsg,
       second_message_hint: secondMsg
@@ -116,13 +112,13 @@ export function generateFirstMessageStrategy({
 
   // CASO 2: NÃO anuncia na Biblioteca da Meta + SEM WhatsApp na Bio
   if (!inAdLibrary && !hasWa) {
-    const firstMsg = `Opa, tudo bom? Tentei chamar vocês no WhatsApp pelo link aqui da bio mas não foi. Qual o WhatsApp aí ${placeWord} pra eu falar rapidinho?`;
-    const secondMsg = `Opa, me passaram seu contato lá no Instagram! Te chamei porque vi o perfil de vocês e reparei que vocês não estão com nenhum anúncio rodando hoje pra puxar cliente pro WhatsApp. Posso te mandar um áudio de 30s?`;
+    const firstMsg = `Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?`;
+    const secondMsg = `Show! Qual o melhor WhatsApp aí ${placeWord} pra eu te mandar um áudio rapidinho de 30s com os pontos que levantei na análise?`;
 
     return {
       case_code: 'CASO_2_NAO_ANUNCIA_SEM_WHATSAPP',
       case_title: 'Caso 2 • Não Anuncia + Sem WhatsApp na Bio',
-      strategy_reason: 'Pede o número direto no Direct como qualquer pessoa normal faria.',
+      strategy_reason: 'Apresenta a análise da Front Work no Direct e já aponta a falta do link direto de conversão.',
       recommended_channel: 'Direct do Instagram',
       first_message: firstMsg,
       second_message_hint: secondMsg
@@ -131,13 +127,13 @@ export function generateFirstMessageStrategy({
 
   // CASO 3: ESTÁ na Biblioteca da Meta (1 a 4 anúncios)
   if (inAdLibrary && Number(activeAdsCount) <= 4) {
-    const firstMsg = `Opa, tudo bom? Vi o anúncio de vocês rodando lá no Instagram. É você mesmo que cuida dessa parte comercial aí ${placeWord} ou tem outra pessoa responsável?`;
-    const secondMsg = `Te perguntei porque trabalho com empresas ${sectorWord} e vi a campanha de vocês. O pessoal que tá chegando pelo anúncio tá vindo qualificado pronto pra fechar ou tá caindo muito curioso perguntando preço?`;
+    const firstMsg = `Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil e nos anúncios ativos de vocês, e percebi alguns pontos que podemos melhorar para converter mais. Hoje você já tem alguma empresa que cuida do seu posicionamento digital ou fazem internamente?`;
+    const secondMsg = `Boa! Reparei um detalhe específico na estrutura de vocês que costuma filtrar curiosos e trazer clientes bem mais prontos pra fechar no WhatsApp. Posso te mandar um áudio de 30s mostrando o que identifiquei?`;
 
     return {
       case_code: 'CASO_3_NA_BIBLIOTECA_POUCOS_ANUNCIOS',
       case_title: `Caso 3 • Já Anuncia (${activeAdsCount} anúncio ativo)`,
-      strategy_reason: 'Entra comentando que viu o anúncio dele rodando e toca na dor de curiosos perguntando preço.',
+      strategy_reason: 'Mostra que analisou tanto o perfil quanto os anúncios ativos e pergunta quem cuida da operação hoje.',
       recommended_channel: hasWa ? 'WhatsApp Direto' : 'Direct do Instagram',
       first_message: firstMsg,
       second_message_hint: secondMsg
@@ -145,13 +141,13 @@ export function generateFirstMessageStrategy({
   }
 
   // CASO 4: ESTÁ na Biblioteca da Meta (5+ anúncios)
-  const firstMsg = `Opa, tudo bom? Vi os anúncios de vocês rodando lá no Instagram. Quem aí ${placeWord} cuida hoje da parte comercial e do atendimento no WhatsApp?`;
-  const secondMsg = `Como vocês já rodam bastante anúncio, queria entender como estão fazendo hoje pra atender na hora e fazer follow-up em quem pede orçamento e some. Posso te mostrar em 30s como automatizamos isso com IA?`;
+  const firstMsg = `Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no posicionamento digital e nas campanhas ativas de vocês, e notei alguns pontos na jornada comercial que podemos melhorar. Hoje você já tem alguma empresa parceira cuidando do seu posicionamento digital e atendimento?`;
+  const secondMsg = `Massa! Como vocês já investem forte em anúncios, mapeamos onde costumam escapar vendas no tempo de resposta e no follow-up pelo WhatsApp. Posso te mandar um áudio de 30s com esse diagnóstico?`;
 
   return {
     case_code: 'CASO_4_NA_BIBLIOTECA_ESCALA_IA',
     case_title: `Caso 4 • Já Anuncia Forte (${activeAdsCount} anúncios)`,
-    strategy_reason: 'Foco em Atendimento com IA e Follow-up para quem já investe em tráfego.',
+    strategy_reason: 'Abordagem Front Work focada em otimização de posicionamento, conversão e atendimento para quem já anuncia.',
     recommended_channel: hasWa ? 'WhatsApp Direto' : 'Direct do Instagram',
     first_message: firstMsg,
     second_message_hint: secondMsg

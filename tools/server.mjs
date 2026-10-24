@@ -535,6 +535,33 @@ function getUserContext(req, explicitUserId = '') {
   user.config.supabaseConnected = isSupabaseActive();
   user.config.datacrazyWebhookUrl = user.config.datacrazyWebhookUrl || env.DATACRAZY_WEBHOOK_URL || '';
   user.leads = user.leads || [];
+  let leadsMigrated = false;
+  for (const lead of user.leads) {
+    if (!String(lead.contact?.personalized_message || '').includes('Front Work')) {
+      const strat = generateFirstMessageStrategy({
+        fullName: lead.instagram?.full_name,
+        username: lead.instagram?.username,
+        nicheId: lead.niche_id,
+        nicheName: lead.niche_name,
+        location: lead.location,
+        biography: lead.instagram?.biography,
+        inAdLibrary: lead.meta_ads?.in_ad_library,
+        activeAdsCount: lead.meta_ads?.active_ads_count,
+        whatsappNumber: lead.contact?.whatsapp_number,
+        followersCount: lead.instagram?.followers_count
+      });
+      lead.message_strategy = strat;
+      lead.contact = lead.contact || {};
+      lead.contact.personalized_message = strat.first_message;
+      lead.contact.whatsapp_link = lead.contact.whatsapp_number
+        ? `https://wa.me/${lead.contact.whatsapp_number}?text=${encodeURIComponent(strat.first_message)}`
+        : `https://ig.me/m/${lead.instagram?.username || ''}`;
+      leadsMigrated = true;
+    }
+  }
+  if (leadsMigrated) {
+    saveUsersDb(usersDb);
+  }
   user.history = user.history || [];
   user.deletedUsernames = user.deletedUsernames || [];
   return { usersDb, user };
@@ -936,7 +963,7 @@ export async function requestHandler(req, res) {
         name: nicheName,
         category,
         keywords: [keyword, nicheName.toLowerCase()],
-        defaultMessage: `Opa, tudo bom? Peguei o contato de vocês lá no Instagram. Quem aí cuida da parte comercial/marketing pra eu falar rapidinho?`
+        defaultMessage: `Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil de vocês e percebi alguns pontos estratégicos que podemos melhorar. Hoje você já tem alguma empresa que cuida do seu posicionamento digital?`
       };
 
       const existingIdx = user.config.niches.findIndex((n) => n.id === nicheId);
