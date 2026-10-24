@@ -680,7 +680,148 @@
 <body>
   <div class="page-grid" aria-hidden="true"></div>
 
-  <div class="content-width">
+  <!-- ====================================================================== -->
+  <!-- TELA 1: TELA DE LOGIN INICIAL (Aparece ao abrir o sistema)             -->
+  <!-- ====================================================================== -->
+  <section id="loginScreenView" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;z-index:2;">
+    <div style="width:100%;max-width:460px;background:rgba(255,255,255,0.88);backdrop-filter:blur(16px);border:0.8px solid var(--border);border-radius:22px;padding:34px 30px 30px;box-shadow:0 24px 60px rgba(27,23,54,0.08);">
+      <!-- Marca no topo do Login -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:18px;">
+        <span class="brand-symbol" style="width:36px;height:36px;font-size:13px;">IA</span>
+        <span style="font:700 15px/1 'Inter',sans-serif;letter-spacing:-0.03em;color:var(--ink-title);">Salles Prospector • @sousalles.ia</span>
+      </div>
+
+      <div style="text-align:center;margin-bottom:22px;">
+        <span class="scribble" style="font-size:21px;margin-bottom:4px;">Bem-vindo de volta</span>
+        <h1 style="margin:0 0 8px;font:700 28px/1.05 'Inter',sans-serif;letter-spacing:-0.06em;color:var(--ink-title);">
+          Acesse sua conta de <em>prospecção</em>
+        </h1>
+        <p style="margin:0;font:400 13px/1.45 'Inter',sans-serif;color:var(--muted);">
+          Suas pesquisas, nichos e leads ficam salvos na sua conta no Supabase.
+        </p>
+      </div>
+
+      <!-- Abas Entrar / Criar Conta -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:5px;background:#f2f2ef;border-radius:14px;margin-bottom:20px;">
+        <button id="authTabLogin" type="button" onclick="switchAuthTab('login')" class="tab-btn tab-btn-active" style="border-radius:10px;padding:11px 12px;text-align:center;">
+          Entrar na Conta
+        </button>
+        <button id="authTabRegister" type="button" onclick="switchAuthTab('register')" class="tab-btn" style="border-radius:10px;padding:11px 12px;text-align:center;border-color:transparent;background:transparent;">
+          Criar Nova Conta
+        </button>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="authLoginForm" onsubmit="event.preventDefault(); submitLogin();" style="display:grid;gap:14px;">
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 6px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">Seu E-mail</span>
+          <input id="loginEmail" type="email" required placeholder="Digite seu e-mail (ex: salles@salles.ia)" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+        </label>
+
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 6px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">Sua Senha</span>
+          <input id="loginPassword" type="password" required placeholder="Digite sua senha" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+        </label>
+
+        <button id="loginSubmitBtn" type="submit" class="btn-codex-primary" style="width:100%;margin-top:6px;padding:15px 22px;font-size:14px;">
+          <span>Entrar no Sistema</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+      </form>
+
+      <!-- Formulário de Criar Nova Conta -->
+      <form id="authRegisterForm" onsubmit="event.preventDefault(); submitRegister();" style="display:none;gap:14px;">
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 6px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">Seu Nome ou Empresa</span>
+          <input id="regName" type="text" placeholder="Ex: Istêfano Salles" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+        </label>
+
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 6px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">Seu E-mail</span>
+          <input id="regEmail" type="email" placeholder="Ex: contato@suaempresa.com" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+        </label>
+
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 6px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">Crie uma Senha</span>
+          <input id="regPassword" type="password" placeholder="Crie sua senha de acesso" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+        </label>
+
+        <button id="registerSubmitBtn" type="submit" class="btn-codex-primary" style="width:100%;margin-top:6px;padding:15px 22px;font-size:14px;">
+          <span>Criar Conta & Escolher Meu Nicho</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ====================================================================== -->
+  <!-- TELA 2: PRÉ-FORMULÁRIO DE PRIMEIRO ACESSO (Onboarding de Novo Usuário) -->
+  <!-- ====================================================================== -->
+  <section id="onboardingScreenView" style="min-height:100vh;display:none;align-items:center;justify-content:center;padding:24px;position:relative;z-index:2;">
+    <div style="width:100%;max-width:580px;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border:0.8px solid var(--border);border-radius:22px;padding:34px 32px 30px;box-shadow:0 24px 60px rgba(27,23,54,0.08);">
+      <div style="text-align:center;margin-bottom:20px;">
+        <span class="scribble" style="font-size:21px;margin-bottom:4px;">Configuração inicial da sua conta</span>
+        <h2 style="margin:0 0 8px;font:700 28px/1.06 'Inter',sans-serif;letter-spacing:-0.06em;color:var(--ink-title);">
+          Qual nicho você tem <em>interesse em buscar?</em>
+        </h2>
+        <p style="margin:0;font:400 13px/1.45 'Inter',sans-serif;color:var(--muted);">
+          Escolha ou digite abaixo o seu nicho de interesse. Vamos salvar no seu login e já fazer uma pré-pesquisa rápida trazendo perfis válidos do Instagram!
+        </p>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <span style="display:block;margin:0 0 8px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">Sugestões rápidas (clique em uma opção ou digite qualquer nicho abaixo):</span>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+          <button type="button" onclick="selectOnboardingPreset('Clínicas Odontológicas', 'clinica odontologica')" class="btn-pill-soft" style="justify-content:flex-start;padding:11px 13px;font-size:12px;">🦷 Clínicas Odontológicas</button>
+          <button type="button" onclick="selectOnboardingPreset('Estética Automotiva', 'estetica automotiva')" class="btn-pill-soft" style="justify-content:flex-start;padding:11px 13px;font-size:12px;">🚘 Estética Automotiva</button>
+          <button type="button" onclick="selectOnboardingPreset('Lojas de Seminovos', 'seminovos multimarcas')" class="btn-pill-soft" style="justify-content:flex-start;padding:11px 13px;font-size:12px;">🚗 Lojas de Seminovos</button>
+          <button type="button" onclick="selectOnboardingPreset('Imobiliárias & Corretores', 'imobiliaria alto padrao')" class="btn-pill-soft" style="justify-content:flex-start;padding:11px 13px;font-size:12px;">🏢 Imobiliárias & Corretores</button>
+          <button type="button" onclick="selectOnboardingPreset('Clínicas de Estética', 'clinica de estetica harmonizacao')" class="btn-pill-soft" style="justify-content:flex-start;padding:11px 13px;font-size:12px;">✨ Estética & Harmonização</button>
+          <button type="button" onclick="selectOnboardingPreset('Energia Solar', 'energia solar fotovoltaica')" class="btn-pill-soft" style="justify-content:flex-start;padding:11px 13px;font-size:12px;">☀️ Energia Solar</button>
+        </div>
+      </div>
+
+      <div style="display:grid;gap:13px;">
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">1. Qual nicho você quer prospectar?</span>
+          <input id="onbNicheName" type="text" placeholder="Ex: Clínicas Odontológicas, Energia Solar, Advocacia..." class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+        </label>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 5px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">2. Palavra-chave de busca</span>
+            <input id="onbKeywords" type="text" placeholder="Ex: clinica odontologica" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+          </label>
+
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 5px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">3. Qual Cidade / Estado alvo?</span>
+            <input id="onbCity" type="text" value="Petrolina - PE" placeholder="Ex: Petrolina - PE" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+          </label>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:12px;background:#f5efff;border:1px solid #d7c4f3;cursor:pointer;">
+          <input id="onbRunPreSearch" type="checkbox" checked style="width:16px;height:16px;accent-color:#7c5cff;" />
+          <span style="font:600 12px 'Inter',sans-serif;color:#292929;">Já fazer a pré-pesquisa rápida (~12s) e carregar os leads na tela</span>
+        </label>
+      </div>
+
+      <div id="onbLoadingInfo" style="display:none;margin-top:14px;padding:13px;border-radius:12px;background:#17152a;color:#e4e0ff;font:600 12px 'Inter',sans-serif;text-align:center;">
+        ⚡ Fazendo a pré-pesquisa do seu nicho no Instagram (100% links válidos)... Aguarde ~12 segundos!
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;">
+        <button type="button" onclick="skipOnboardingToDashboard()" class="tab-btn">Ir direto ao painel</button>
+        <button id="onbSubmitBtn" type="button" onclick="submitOnboardingForm()" class="btn-codex-primary" style="padding:14px 24px;font-size:13px;">
+          <span>Concluir & Começar Prospecção →</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================== -->
+  <!-- TELA 3: PAINEL PRINCIPAL DE PROSPECÇÃO (Só abre após fazer Login)      -->
+  <!-- ====================================================================== -->
+  <div id="appMainView" class="content-width" style="display:none;">
     <!-- Topbar -->
     <header class="topbar">
       <a href="#" class="brand-mark">
@@ -693,15 +834,13 @@
           <i></i>
           Supabase Conectado
         </span>
-        <span class="status-chip">
-          <i></i>
-          Busca Rápida (100% Válidos)
-        </span>
         <button id="triggerStatusBtn" onclick="openTriggerModal()" class="btn-pill-soft">⚡ Gatilho: Manual</button>
-        <button onclick="openOnboardingModal()" class="btn-pill-soft">🎯 Pré-Formulário</button>
         <button onclick="openNewNicheModal()" class="btn-pill-soft">+ Novo Nicho</button>
-        <button id="userMenuBtn" onclick="openAuthModal()" class="btn-pill-soft" style="background:#f5efff;border-color:#d7c4f3;color:#5a3cc0;">
-          👤 <span id="currentUserNameLabel">Istêfano Salles</span> • Trocar Login
+        <span style="padding:8px 13px;border-radius:999px;background:#f5efff;border:0.8px solid #d7c4f3;color:#5a3cc0;font:600 12px/1 'Inter',sans-serif;">
+          👤 <span id="currentUserNameLabel">Usuário</span>
+        </span>
+        <button onclick="logoutUser()" class="btn-pill-soft" style="color:#636363;">
+          Sair
         </button>
       </div>
     </header>
@@ -991,131 +1130,22 @@
     </div>
   </div>
 
-  <!-- Modal de Login / Criar Nova Conta (Pesquisa Salva por Login) -->
-  <div id="authModal" class="quiz-overlay">
-    <div class="quiz-dialog" style="max-width:460px;">
-      <span class="scribble">Pesquisa Salva por Login</span>
-      <h3 style="margin:0 0 8px;font:700 22px/1.1 Inter,sans-serif;letter-spacing:-0.06em;color:#292929;">
-        Entrar ou criar <em>novo login</em>
-      </h3>
-      <p style="margin:0 0 16px;font:400 12px/1.45 Inter,sans-serif;color:#5c5c5c;">
-        Cada login tem sua própria base de leads, nichos e histórico salvos separadamente. Ao criar um usuário novo, abriremos o <b>Pré-Formulário de Nicho</b> para já fazer a primeira pré-pesquisa!
-      </p>
-
-      <!-- Abas Login / Cadastro -->
-      <div style="display:flex;gap:8px;margin-bottom:14px;">
-        <button id="authTabLogin" onclick="switchAuthTab('login')" class="tab-btn tab-btn-active" style="flex:1;">Entrar em Conta</button>
-        <button id="authTabRegister" onclick="switchAuthTab('register')" class="tab-btn" style="flex:1;">Sou Usuário Novo (Criar)</button>
-      </div>
-
-      <!-- Formulário de Login -->
-      <div id="authLoginForm" style="display:grid;gap:11px;">
-        <label style="display:block;">
-          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Seu E-mail</span>
-          <input id="loginEmail" type="email" value="salles@salles.ia" placeholder="Ex: voce@empresa.com" class="clean-input" style="width:100%;" />
-        </label>
-        <label style="display:block;">
-          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Senha</span>
-          <input id="loginPassword" type="password" value="123" placeholder="Sua senha" class="clean-input" style="width:100%;" />
-        </label>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;">
-          <button onclick="closeAuthModal()" class="tab-btn">Cancelar</button>
-          <button onclick="submitLogin()" class="btn-codex-primary" style="padding:11px 20px;">Entrar no Meu Painel</button>
-        </div>
-      </div>
-
-      <!-- Formulário de Novo Usuário -->
-      <div id="authRegisterForm" style="display:none;gap:11px;">
-        <label style="display:block;">
-          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Seu Nome ou Empresa</span>
-          <input id="regName" type="text" placeholder="Ex: João Consultoria" class="clean-input" style="width:100%;" />
-        </label>
-        <label style="display:block;">
-          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">E-mail de Acesso</span>
-          <input id="regEmail" type="email" placeholder="Ex: joao@agencia.com" class="clean-input" style="width:100%;" />
-        </label>
-        <label style="display:block;">
-          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Criar Senha</span>
-          <input id="regPassword" type="password" value="123" placeholder="Crie uma senha simples" class="clean-input" style="width:100%;" />
-        </label>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;">
-          <button onclick="closeAuthModal()" class="tab-btn">Cancelar</button>
-          <button onclick="submitRegister()" class="btn-codex-primary" style="padding:11px 20px;">Criar Conta & Abrir Pré-Formulário →</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Pré-Formulário de Primeiro Acesso (Onboarding de Nicho) -->
-  <div id="onboardingModal" class="quiz-overlay">
-    <div class="quiz-dialog" style="max-width:540px;">
-      <span class="scribble">Bem-vindo ao Salles Prospector!</span>
-      <h3 style="margin:0 0 8px;font:700 24px/1.1 Inter,sans-serif;letter-spacing:-0.06em;color:#292929;">
-        Qual nicho você tem <em>interesse em buscar?</em>
-      </h3>
-      <p style="margin:0 0 16px;font:400 12.5px/1.45 Inter,sans-serif;color:#5c5c5c;">
-        Preencha este rápido pré-formulário. Vamos configurar seu painel personalizado e já rodar uma <b>pré-pesquisa ultra-rápida (~12s)</b> trazendo apenas perfis válidos do Instagram!
-      </p>
-
-      <div style="margin-bottom:14px;">
-        <span style="display:block;margin:0 0 7px 2px;font:600 11px Inter,sans-serif;color:#636363;">Sugestões rápidas (clique para preencher ou digite qualquer nicho abaixo):</span>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;">
-          <button type="button" onclick="selectOnboardingPreset('Clínicas Odontológicas', 'clinica odontologica')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">🦷 Clínicas Odontológicas</button>
-          <button type="button" onclick="selectOnboardingPreset('Estética Automotiva', 'estetica automotiva')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">🚘 Estética Automotiva</button>
-          <button type="button" onclick="selectOnboardingPreset('Lojas de Seminovos', 'seminovos multimarcas')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">🚗 Lojas de Seminovos</button>
-          <button type="button" onclick="selectOnboardingPreset('Imobiliárias & Corretores', 'imobiliaria alto padrao')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">🏢 Imobiliárias</button>
-          <button type="button" onclick="selectOnboardingPreset('Clínicas de Estética', 'clinica de estetica harmonizacao')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">✨ Estética & Harmonização</button>
-          <button type="button" onclick="selectOnboardingPreset('Energia Solar', 'energia solar fotovoltaica')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">☀️ Energia Solar</button>
-        </div>
-      </div>
-
-      <div style="display:grid;gap:12px;">
-        <label style="display:block;">
-          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">1. Qual o Nome do Nicho que você quer prospectar?</span>
-          <input id="onbNicheName" type="text" placeholder="Ex: Clínicas Odontológicas, Energia Solar, Pizzarias..." class="clean-input" style="width:100%;" />
-        </label>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <label style="display:block;">
-            <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">2. Termo principal no Instagram</span>
-            <input id="onbKeywords" type="text" placeholder="Ex: clinica odontologica" class="clean-input" style="width:100%;" />
-          </label>
-
-          <label style="display:block;">
-            <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">3. Qual Cidade / Região alvo?</span>
-            <input id="onbCity" type="text" value="Petrolina - PE" placeholder="Ex: Petrolina - PE" class="clean-input" style="width:100%;" />
-          </label>
-        </div>
-
-        <label style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:11px;background:#f5efff;border:1px solid #d7c4f3;cursor:pointer;">
-          <input id="onbRunPreSearch" type="checkbox" checked style="width:16px;height:16px;accent-color:#7c5cff;" />
-          <span style="font:600 12px Inter,sans-serif;color:#292929;">Já fazer a Pré-Pesquisa automática de leads válidos agora (~12 seg)</span>
-        </label>
-      </div>
-
-      <div id="onbLoadingInfo" style="display:none;margin-top:14px;padding:12px;border-radius:12px;background:#17152a;color:#e4e0ff;font:600 12px Inter,sans-serif;text-align:center;">
-        ⚡ Fazendo a pré-pesquisa do seu nicho no Instagram (100% links reais)... Aguarde ~12 segundos!
-      </div>
-
-      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
-        <button type="button" onclick="closeOnboardingModal()" class="tab-btn">Pular por enquanto</button>
-        <button id="onbSubmitBtn" type="button" onclick="submitOnboardingForm()" class="btn-codex-primary" style="padding:12px 20px;">
-          Salvar Nicho & Começar →
-        </button>
-      </div>
-    </div>
-  </div>
-
   <div id="toast" class="toast"></div>
 
   <script>
     let STATE = { user: null, leads: [], history: [], config: { niches: [], selectedNicheId: '' } };
     let ACTIVE_TAB = 'prioridade_alta';
-    let CURRENT_USER_ID = localStorage.getItem('salles_prospector_user_id') || 'user-salles';
+    let CURRENT_USER_ID = sessionStorage.getItem('salles_prospector_active_user_id') || '';
+
+    function showScreen(screenName) {
+      document.getElementById('loginScreenView').style.display = screenName === 'login' ? 'flex' : 'none';
+      document.getElementById('onboardingScreenView').style.display = screenName === 'onboarding' ? 'flex' : 'none';
+      document.getElementById('appMainView').style.display = screenName === 'dashboard' ? 'block' : 'none';
+    }
 
     function apiFetch(url, options = {}) {
       const headers = Object.assign({}, options.headers || {}, {
-        'X-User-Id': CURRENT_USER_ID
+        'X-User-Id': CURRENT_USER_ID || 'user-salles'
       });
       return fetch(url, Object.assign({}, options, { headers }));
     }
@@ -1128,11 +1158,15 @@
     }
 
     async function fetchState() {
+      if (!CURRENT_USER_ID) {
+        showScreen('login');
+        return;
+      }
       const res = await apiFetch('/api/state');
       STATE = await res.json();
       if (STATE.user) {
         CURRENT_USER_ID = STATE.user.id;
-        localStorage.setItem('salles_prospector_user_id', CURRENT_USER_ID);
+        sessionStorage.setItem('salles_prospector_active_user_id', CURRENT_USER_ID);
         const lbl = document.getElementById('currentUserNameLabel');
         if (lbl) lbl.textContent = STATE.user.name;
       }
@@ -1142,22 +1176,32 @@
       renderLeads();
 
       if (STATE.user && STATE.user.onboardingCompleted === false) {
-        openOnboardingModal();
+        showScreen('onboarding');
+      } else {
+        showScreen('dashboard');
       }
     }
 
-    function openAuthModal() {
-      document.getElementById('authModal').style.display = 'flex';
-    }
-
-    function closeAuthModal() {
-      document.getElementById('authModal').style.display = 'none';
+    function logoutUser() {
+      CURRENT_USER_ID = '';
+      sessionStorage.removeItem('salles_prospector_active_user_id');
+      document.getElementById('loginPassword').value = '';
+      showScreen('login');
+      showToast('Você saiu da sua conta.');
     }
 
     function switchAuthTab(tab) {
       const isLogin = tab === 'login';
-      document.getElementById('authTabLogin').className = isLogin ? 'tab-btn tab-btn-active' : 'tab-btn';
-      document.getElementById('authTabRegister').className = !isLogin ? 'tab-btn tab-btn-active' : 'tab-btn';
+      const btnLogin = document.getElementById('authTabLogin');
+      const btnReg = document.getElementById('authTabRegister');
+      btnLogin.className = isLogin ? 'tab-btn tab-btn-active' : 'tab-btn';
+      btnLogin.style.background = isLogin ? '' : 'transparent';
+      btnLogin.style.borderColor = isLogin ? '' : 'transparent';
+
+      btnReg.className = !isLogin ? 'tab-btn tab-btn-active' : 'tab-btn';
+      btnReg.style.background = !isLogin ? '' : 'transparent';
+      btnReg.style.borderColor = !isLogin ? '' : 'transparent';
+
       document.getElementById('authLoginForm').style.display = isLogin ? 'grid' : 'none';
       document.getElementById('authRegisterForm').style.display = !isLogin ? 'grid' : 'none';
     }
@@ -1167,55 +1211,63 @@
       const password = document.getElementById('loginPassword').value.trim();
       if (!email) return showToast('Digite seu e-mail para entrar.');
 
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        return showToast(data.error || 'Erro ao fazer login.');
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          return showToast(data.error || 'E-mail ou senha incorretos.');
+        }
+        CURRENT_USER_ID = data.user.id;
+        sessionStorage.setItem('salles_prospector_active_user_id', CURRENT_USER_ID);
+        await fetchState();
+        showToast(`Bem-vindo, ${data.user.name}!`);
+      } finally {
+        btn.disabled = false;
       }
-      CURRENT_USER_ID = data.user.id;
-      localStorage.setItem('salles_prospector_user_id', CURRENT_USER_ID);
-      closeAuthModal();
-      await fetchState();
-      showToast(`Bem-vindo de volta, ${data.user.name}! Suas pesquisas salvas foram carregadas.`);
     }
 
     async function submitRegister() {
       const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value.trim();
-      if (!name || !email) return showToast('Preencha nome e e-mail para criar seu login!');
+      if (!name || !email || !password) return showToast('Preencha seu nome, e-mail e senha!');
 
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        return showToast(data.error || 'Erro ao criar conta.');
+      const btn = document.getElementById('registerSubmitBtn');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          return showToast(data.error || 'Erro ao criar conta.');
+        }
+        CURRENT_USER_ID = data.user.id;
+        sessionStorage.setItem('salles_prospector_active_user_id', CURRENT_USER_ID);
+        STATE.user = data.user;
+        STATE.config = data.config;
+        STATE.leads = [];
+        STATE.history = [];
+        showScreen('onboarding');
+        showToast(`Conta criada, ${data.user.name}! Escolha o nicho que deseja prospectar.`);
+      } finally {
+        btn.disabled = false;
       }
-      CURRENT_USER_ID = data.user.id;
-      localStorage.setItem('salles_prospector_user_id', CURRENT_USER_ID);
-      closeAuthModal();
-      await fetchState();
-      openOnboardingModal();
-      showToast(`Conta criada para ${data.user.name}! Preencha seu Pré-Formulário de Nicho.`);
     }
 
-    function openOnboardingModal() {
-      const pref = (STATE.user && STATE.user.preferences) || {};
-      if (pref.interestedNiche) document.getElementById('onbNicheName').value = pref.interestedNiche;
-      if (pref.targetKeywords) document.getElementById('onbKeywords').value = pref.targetKeywords;
-      if (pref.targetCity) document.getElementById('onbCity').value = pref.targetCity;
-      document.getElementById('onboardingModal').style.display = 'flex';
-    }
-
-    function closeOnboardingModal() {
-      document.getElementById('onboardingModal').style.display = 'none';
+    function skipOnboardingToDashboard() {
+      showScreen('dashboard');
+      populateNiches();
+      renderKPIs();
+      renderLeads();
     }
 
     function selectOnboardingPreset(nicheName, keyword) {
@@ -1251,11 +1303,13 @@
           STATE.leads = data.leads || [];
           STATE.history = data.history || [];
           document.getElementById('locationInput').value = targetCity;
+          const lbl = document.getElementById('currentUserNameLabel');
+          if (lbl && STATE.user) lbl.textContent = STATE.user.name;
           populateNiches();
           renderKPIs();
           renderLeads();
-          closeOnboardingModal();
-          showToast(`Pré-formulário salvo! Nicho "${interestedNiche}" configurado com ${STATE.leads.length} leads válidos.`);
+          showScreen('dashboard');
+          showToast(`Pronto! Nicho "${interestedNiche}" salvo com ${STATE.leads.length} leads válidos.`);
           if (runPreSearch) {
             setTimeout(fetchState, 22000);
           }
