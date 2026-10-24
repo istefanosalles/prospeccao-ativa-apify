@@ -1,3 +1,459 @@
 {
-  "users": []
+  "users": [
+    {
+      "id": "user-1792869200934",
+      "name": "Front Work",
+      "email": "istefano314@gmail.com",
+      "password": "1245iI#@",
+      "onboardingCompleted": true,
+      "preferences": {
+        "keyword": "seminovos multimarcas",
+        "category": "Lojas de Seminovos",
+        "location": "Petrolina - PE",
+        "nicheName": "Lojas de Seminovos",
+        "targetCity": "Petrolina - PE",
+        "targetKeywords": "seminovos multimarcas",
+        "interestedNiche": "Lojas de Seminovos"
+      },
+      "leads": [
+        {
+          "id": "lead-valesorrirpnz",
+          "niche_id": "lojas-de-seminovos",
+          "niche_name": "Lojas de Seminovos",
+          "location": "Petrolina - PE",
+          "instagram": {
+            "username": "valesorrirpnz",
+            "full_name": "Clínica odontológica em Petrolina",
+            "profile_url": "https://www.instagram.com/valesorrirpnz/",
+            "followers_count": 1400,
+            "biography": "Há 5 anos cuidando da SAÚDE do seu sorriso. Aparelho, lentes, próteses, cirurgias, implantes, DTM RT - CRO/PE 15409 Dra Roberta Alves / Contato ↘️.",
+            "external_url": ""
+          },
+          "meta_ads": {
+            "checked_at": "2026-10-24T19:29:36.887Z",
+            "in_ad_library": false,
+            "active_ads_count": 0,
+            "ad_library_status_label": "Não está na Biblioteca",
+            "ad_library_url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=valesorrirpnz"
+          },
+          "qualification": {
+            "priority": "ALTA",
+            "priority_label": "Prioridade Alta",
+            "closing_potential": "MEDIO",
+            "closing_score": 65,
+            "closing_reason": "Não anuncia na Biblioteca da Meta + Sem WhatsApp direto na bio (abordar via DM/Link) + Perfil ativo (1.400 seguidores)"
+          },
+          "message_strategy": {
+            "case_code": "CASO_2_NAO_ANUNCIA_SEM_WHATSAPP",
+            "case_title": "Caso 2 • Não Anuncia + Sem WhatsApp na Bio",
+            "strategy_reason": "Apresenta a análise da Front Work no Direct e já aponta a falta do link direto de conversão.",
+            "recommended_channel": "Direct do Instagram",
+            "first_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "second_message_hint": "Show! Qual o melhor WhatsApp aí da loja pra eu te mandar um áudio rapidinho de 30s com os pontos que levantei na análise?"
+          },
+          "contact": {
+            "whatsapp_number": "",
+            "whatsapp_link": "https://ig.me/m/valesorrirpnz",
+            "personalized_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "pipeline_status": "novo",
+            "datacrazy_synced": false,
+            "datacrazy_synced_at": null
+          }
+        },
+        {
+          "id": "lead-orthovippetrolina",
+          "niche_id": "lojas-de-seminovos",
+          "niche_name": "Lojas de Seminovos",
+          "location": "Petrolina - PE",
+          "instagram": {
+            "username": "orthovippetrolina",
+            "full_name": "Ortho Vip Odontologia",
+            "profile_url": "https://www.instagram.com/orthovippetrolina/",
+            "followers_count": 3900,
+            "biography": "✨Há 11 anos transformando pessoas através do sorriso! (87) 9 99612-9875 ⭣Agende sua consulta: · Você ainda não nos conhece ? · ✨ Clareamento de Consultório ...",
+            "external_url": "https://wa.me/5587996129875"
+          },
+          "meta_ads": {
+            "checked_at": "2026-10-24T19:29:36.887Z",
+            "in_ad_library": false,
+            "active_ads_count": 0,
+            "ad_library_status_label": "Não está na Biblioteca",
+            "ad_library_url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=orthovippetrolina"
+          },
+          "qualification": {
+            "priority": "ALTA",
+            "priority_label": "Prioridade Alta",
+            "closing_potential": "ALTO",
+            "closing_score": 100,
+            "closing_reason": "Não anuncia na Biblioteca da Meta + Possui WhatsApp direto identificado + Perfil ativo (3.900 seguidores)"
+          },
+          "message_strategy": {
+            "case_code": "CASO_1_NAO_ANUNCIA_COM_WHATSAPP",
+            "case_title": "Caso 1 • Não Anuncia + Tem WhatsApp",
+            "strategy_reason": "Abordagem consultiva Salles (Front Work): gera autoridade com a análise prévia do perfil e abre conversa perguntando sobre o posicionamento digital.",
+            "recommended_channel": "WhatsApp Direto",
+            "first_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil de vocês e percebi alguns pontos estratégicos que podemos melhorar. Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "second_message_hint": "Perfeito! Na análise que fiz, reparei que vocês têm uma ótima estrutura, mas não estão com campanhas ativas hoje pra trazer clientes novos todo dia pro WhatsApp. Posso te mandar um áudio rápido de 30 segundos explicando os pontos que levantei?"
+          },
+          "contact": {
+            "whatsapp_number": "5587996129875",
+            "whatsapp_link": "https://wa.me/5587996129875?text=Opa%2C%20tudo%20bem%3F%20Me%20chamo%20Salles%20e%20falo%20em%20nome%20da%20Front%20Work.%20Estou%20entrando%20em%20contato%20porque%20fiz%20uma%20an%C3%A1lise%20detalhada%20no%20perfil%20de%20voc%C3%AAs%20e%20percebi%20alguns%20pontos%20estrat%C3%A9gicos%20que%20podemos%20melhorar.%20Hoje%20voc%C3%AA%20j%C3%A1%20tem%20alguma%20empresa%20que%20cuida%20do%20seu%20posicionamento%20digital%3F",
+            "personalized_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil de vocês e percebi alguns pontos estratégicos que podemos melhorar. Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "pipeline_status": "novo",
+            "datacrazy_synced": false,
+            "datacrazy_synced_at": null
+          }
+        },
+        {
+          "id": "lead-meudentistapnz",
+          "niche_id": "lojas-de-seminovos",
+          "niche_name": "Lojas de Seminovos",
+          "location": "Petrolina - PE",
+          "instagram": {
+            "username": "meudentistapnz",
+            "full_name": "CLÍNICA MEU DENTISTA",
+            "profile_url": "https://www.instagram.com/meudentistapnz/",
+            "followers_count": 2300,
+            "biography": "Há 6 anos cuidando do seu sorriso com excelência✨ ↓ Agende sua consulta no link. EPAO 1281. RT Gabriel Gomes 14044 CRO-PE.",
+            "external_url": ""
+          },
+          "meta_ads": {
+            "checked_at": "2026-10-24T19:29:36.887Z",
+            "in_ad_library": false,
+            "active_ads_count": 0,
+            "ad_library_status_label": "Não está na Biblioteca",
+            "ad_library_url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=meudentistapnz"
+          },
+          "qualification": {
+            "priority": "ALTA",
+            "priority_label": "Prioridade Alta",
+            "closing_potential": "MEDIO",
+            "closing_score": 65,
+            "closing_reason": "Não anuncia na Biblioteca da Meta + Sem WhatsApp direto na bio (abordar via DM/Link) + Perfil ativo (2.300 seguidores)"
+          },
+          "message_strategy": {
+            "case_code": "CASO_2_NAO_ANUNCIA_SEM_WHATSAPP",
+            "case_title": "Caso 2 • Não Anuncia + Sem WhatsApp na Bio",
+            "strategy_reason": "Apresenta a análise da Front Work no Direct e já aponta a falta do link direto de conversão.",
+            "recommended_channel": "Direct do Instagram",
+            "first_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "second_message_hint": "Show! Qual o melhor WhatsApp aí da loja pra eu te mandar um áudio rapidinho de 30s com os pontos que levantei na análise?"
+          },
+          "contact": {
+            "whatsapp_number": "",
+            "whatsapp_link": "https://ig.me/m/meudentistapnz",
+            "personalized_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "pipeline_status": "novo",
+            "datacrazy_synced": false,
+            "datacrazy_synced_at": null
+          }
+        },
+        {
+          "id": "lead-odontoliderpetrolina",
+          "niche_id": "lojas-de-seminovos",
+          "niche_name": "Lojas de Seminovos",
+          "location": "Petrolina - PE",
+          "instagram": {
+            "username": "odontoliderpetrolina",
+            "full_name": "Dentista em Petrolina-PE 🦷",
+            "profile_url": "https://www.instagram.com/odontoliderpetrolina/",
+            "followers_count": 6000,
+            "biography": "Somos Líder em Saúde Bucal! ✨ Profissionais capacitados para cuidar do seu sorriso Agende pelo WhatsApp  .",
+            "external_url": ""
+          },
+          "meta_ads": {
+            "checked_at": "2026-10-24T19:29:36.886Z",
+            "in_ad_library": false,
+            "active_ads_count": 0,
+            "ad_library_status_label": "Não está na Biblioteca",
+            "ad_library_url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=odontoliderpetrolina"
+          },
+          "qualification": {
+            "priority": "ALTA",
+            "priority_label": "Prioridade Alta",
+            "closing_potential": "MEDIO",
+            "closing_score": 65,
+            "closing_reason": "Não anuncia na Biblioteca da Meta + Sem WhatsApp direto na bio (abordar via DM/Link) + Perfil ativo (6.000 seguidores)"
+          },
+          "message_strategy": {
+            "case_code": "CASO_2_NAO_ANUNCIA_SEM_WHATSAPP",
+            "case_title": "Caso 2 • Não Anuncia + Sem WhatsApp na Bio",
+            "strategy_reason": "Apresenta a análise da Front Work no Direct e já aponta a falta do link direto de conversão.",
+            "recommended_channel": "Direct do Instagram",
+            "first_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "second_message_hint": "Show! Qual o melhor WhatsApp aí da loja pra eu te mandar um áudio rapidinho de 30s com os pontos que levantei na análise?"
+          },
+          "contact": {
+            "whatsapp_number": "",
+            "whatsapp_link": "https://ig.me/m/odontoliderpetrolina",
+            "personalized_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "pipeline_status": "novo",
+            "datacrazy_synced": false,
+            "datacrazy_synced_at": null
+          }
+        },
+        {
+          "id": "lead-vizzeautomoveis",
+          "contact": {
+            "whatsapp_link": "https://wa.me/5587999885850?text=Opa%2C%20tudo%20bem%3F%20Me%20chamo%20Salles%20e%20falo%20em%20nome%20da%20Front%20Work.%20Estou%20entrando%20em%20contato%20porque%20fiz%20uma%20an%C3%A1lise%20detalhada%20no%20perfil%20de%20voc%C3%AAs%20e%20percebi%20alguns%20pontos%20estrat%C3%A9gicos%20que%20podemos%20melhorar.%20Hoje%20voc%C3%AA%20j%C3%A1%20tem%20alguma%20empresa%20que%20cuida%20do%20seu%20posicionamento%20digital%3F",
+            "pipeline_status": "novo",
+            "whatsapp_number": "5587999885850",
+            "datacrazy_synced": true,
+            "datacrazy_synced_at": "2026-10-24T19:13:54.551Z",
+            "personalized_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil de vocês e percebi alguns pontos estratégicos que podemos melhorar. Hoje você já tem alguma empresa que cuida do seu posicionamento digital?"
+          },
+          "location": "Petrolina - PE",
+          "meta_ads": {
+            "checked_at": "2026-10-24T19:13:53.719Z",
+            "in_ad_library": false,
+            "ad_library_url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=vizzeautomoveis",
+            "active_ads_count": 0,
+            "ad_library_status_label": "Não está na Biblioteca"
+          },
+          "niche_id": "lojas-de-seminovos",
+          "instagram": {
+            "username": "vizzeautomoveis",
+            "biography": "Seu novo carro está aqui! Loja especializada em seminovos 87 38621444 87 99988 5850 Pimentel 87 99648 4670 Jackson 87 99998 3676 Murilo.",
+            "full_name": "VIZZE Consórcios e Automóveis Petrolina ...",
+            "profile_url": "https://www.instagram.com/vizzeautomoveis/",
+            "external_url": "https://wa.me/5587999885850",
+            "followers_count": 8000
+          },
+          "niche_name": "Lojas de Seminovos",
+          "qualification": {
+            "priority": "ALTA",
+            "closing_score": 100,
+            "closing_reason": "Não anuncia na Biblioteca da Meta + Possui WhatsApp direto identificado + Perfil ativo (8.000 seguidores)",
+            "priority_label": "Prioridade Alta",
+            "closing_potential": "ALTO"
+          },
+          "message_strategy": {
+            "case_code": "CASO_1_NAO_ANUNCIA_COM_WHATSAPP",
+            "case_title": "Caso 1 • Não Anuncia + Tem WhatsApp",
+            "first_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil de vocês e percebi alguns pontos estratégicos que podemos melhorar. Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "strategy_reason": "Abordagem consultiva Salles (Front Work): gera autoridade com a análise prévia do perfil e abre conversa perguntando sobre o posicionamento digital.",
+            "recommended_channel": "WhatsApp Direto",
+            "second_message_hint": "Perfeito! Na análise que fiz, reparei que vocês têm uma ótima estrutura, mas não estão com campanhas ativas hoje pra trazer clientes novos todo dia pro WhatsApp. Posso te mandar um áudio rápido de 30 segundos explicando os pontos que levantei?"
+          }
+        },
+        {
+          "id": "lead-zeniltonautomoveis",
+          "contact": {
+            "whatsapp_link": "https://ig.me/m/zeniltonautomoveis",
+            "pipeline_status": "novo",
+            "whatsapp_number": "",
+            "datacrazy_synced": true,
+            "datacrazy_synced_at": "2026-10-24T19:13:53.718Z",
+            "personalized_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?"
+          },
+          "location": "Petrolina - PE",
+          "meta_ads": {
+            "checked_at": "2026-10-24T19:13:53.399Z",
+            "in_ad_library": false,
+            "ad_library_url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=zeniltonautomoveis",
+            "active_ads_count": 0,
+            "ad_library_status_label": "Não está na Biblioteca"
+          },
+          "niche_id": "lojas-de-seminovos",
+          "instagram": {
+            "username": "zeniltonautomoveis",
+            "biography": "Desde 1995 em Petrolina Compra e venda de veículos seminovos Financiamentos com as melhores taxas. Atendimento direto no WhatsApp ⬇️.",
+            "full_name": "Zenilton Automoveis",
+            "profile_url": "https://www.instagram.com/zeniltonautomoveis/",
+            "external_url": "",
+            "followers_count": 6200
+          },
+          "niche_name": "Lojas de Seminovos",
+          "qualification": {
+            "priority": "ALTA",
+            "closing_score": 65,
+            "closing_reason": "Não anuncia na Biblioteca da Meta + Sem WhatsApp direto na bio (abordar via DM/Link) + Perfil ativo (6.200 seguidores)",
+            "priority_label": "Prioridade Alta",
+            "closing_potential": "MEDIO"
+          },
+          "message_strategy": {
+            "case_code": "CASO_2_NAO_ANUNCIA_SEM_WHATSAPP",
+            "case_title": "Caso 2 • Não Anuncia + Sem WhatsApp na Bio",
+            "first_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Fiz uma análise detalhada aqui no perfil de vocês e percebi alguns pontos que podemos melhorar (inclusive pra facilitar a chegada de clientes no WhatsApp). Hoje você já tem alguma empresa que cuida do seu posicionamento digital?",
+            "strategy_reason": "Apresenta a análise da Front Work no Direct e já aponta a falta do link direto de conversão.",
+            "recommended_channel": "Direct do Instagram",
+            "second_message_hint": "Show! Qual o melhor WhatsApp aí da loja pra eu te mandar um áudio rapidinho de 30s com os pontos que levantei na análise?"
+          }
+        },
+        {
+          "id": "lead-bariseminovos",
+          "contact": {
+            "whatsapp_link": "https://ig.me/m/bariseminovos",
+            "pipeline_status": "novo",
+            "whatsapp_number": "",
+            "datacrazy_synced": true,
+            "datacrazy_synced_at": "2026-10-24T19:13:53.399Z",
+            "personalized_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil e nos anúncios ativos de vocês, e percebi alguns pontos que podemos melhorar para converter mais. Hoje você já tem alguma empresa que cuida do seu posicionamento digital ou fazem internamente?"
+          },
+          "location": "Petrolina - PE",
+          "meta_ads": {
+            "checked_at": "2026-10-24T19:13:52.867Z",
+            "in_ad_library": true,
+            "ad_library_url": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=bariseminovos",
+            "active_ads_count": 1,
+            "ad_library_status_label": "Está na Biblioteca (1 anúncios)"
+          },
+          "niche_id": "lojas-de-seminovos",
+          "instagram": {
+            "username": "bariseminovos",
+            "biography": "✨ Na Bari Seminovos, tem oportunidade esperando por você. Venha conferir de perto e encontrar o seu próximo carro! Vem pra Bari   #seminovos #vemprabari # ...",
+            "full_name": "BARI SEMINOVOS | Petrolina-PE e Caruaru-PE (@ ...",
+            "profile_url": "https://www.instagram.com/bariseminovos/",
+            "external_url": "",
+            "followers_count": 9000
+          },
+          "niche_name": "Lojas de Seminovos",
+          "qualification": {
+            "priority": "BAIXA",
+            "closing_score": 30,
+            "closing_reason": "Já está na Biblioteca (1 anúncio(s) ativo(s)) + Sem WhatsApp direto na bio (abordar via DM/Link) + Perfil ativo (9.000 seguidores)",
+            "priority_label": "Não Prioritário Inicialmente",
+            "closing_potential": "BAIXO"
+          },
+          "message_strategy": {
+            "case_code": "CASO_3_NA_BIBLIOTECA_POUCOS_ANUNCIOS",
+            "case_title": "Caso 3 • Já Anuncia (1 anúncio ativo)",
+            "first_message": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil e nos anúncios ativos de vocês, e percebi alguns pontos que podemos melhorar para converter mais. Hoje você já tem alguma empresa que cuida do seu posicionamento digital ou fazem internamente?",
+            "strategy_reason": "Mostra que analisou tanto o perfil quanto os anúncios ativos e pergunta quem cuida da operação hoje.",
+            "recommended_channel": "Direct do Instagram",
+            "second_message_hint": "Boa! Reparei um detalhe específico na estrutura de vocês que costuma filtrar curiosos e trazer clientes bem mais prontos pra fechar no WhatsApp. Posso te mandar um áudio de 30s mostrando o que identifiquei?"
+          }
+        }
+      ],
+      "history": [
+        {
+          "id": "run-1792870176887",
+          "source": "manual",
+          "nicheName": "Lojas de Seminovos",
+          "searchQuery": "dentista clinica odontologica Petrolina",
+          "location": "Petrolina - PE",
+          "foundCount": 4,
+          "discardedCount": 0,
+          "highPriorityCount": 4,
+          "inLibraryCount": 0,
+          "timestamp": "2026-10-24T19:29:36.887Z"
+        },
+        {
+          "id": "run-1792869234551",
+          "source": "manual",
+          "location": "Petrolina - PE",
+          "nicheName": "Lojas de Seminovos",
+          "timestamp": "2026-10-24T19:13:54.551Z",
+          "foundCount": 3,
+          "searchQuery": "seminovos multimarcas Petrolina",
+          "discardedCount": 0,
+          "inLibraryCount": 0,
+          "highPriorityCount": 3
+        }
+      ],
+      "deletedUsernames": [],
+      "config": {
+        "niches": [
+          {
+            "id": "lojas-de-seminovos",
+            "name": "Lojas de Seminovos",
+            "category": "Lojas de Seminovos",
+            "keywords": [
+              "seminovos multimarcas",
+              "lojas de seminovos"
+            ],
+            "defaultMessage": "Opa, tudo bem? Me chamo Salles e falo em nome da Front Work. Estou entrando em contato porque fiz uma análise detalhada no perfil de vocês e percebi alguns pontos estratégicos que podemos melhorar. Hoje você já tem alguma empresa que cuida do seu posicionamento digital?"
+          },
+          {
+            "id": "automotivo-estetica",
+            "name": "Estética Automotiva & Detailing",
+            "category": "Automotivo",
+            "keywords": [
+              "estetica automotiva",
+              "polimento automotivo",
+              "vitrificacao automotiva",
+              "detailing"
+            ],
+            "defaultMessage": "Olá, {nome}! Vi o perfil @{username} no Instagram e achei o trabalho de estética automotiva de vocês impecável. Notei que vocês não estão com anúncios ativos na Biblioteca da Meta hoje para atrair donos de carros da região todos os dias. Posso te mostrar rapidinho como geramos orçamentos diários de vitrificação e polimento direto no WhatsApp?"
+          },
+          {
+            "id": "automotivo-revenda",
+            "name": "Loja de Veículos & Seminovos",
+            "category": "Automotivo",
+            "keywords": [
+              "seminovos",
+              "multimarcas",
+              "loja de carros",
+              "veiculos seminovos"
+            ],
+            "defaultMessage": "Fala, {nome}! Acompanhei o estoque da @{username} no Instagram e vi que têm ótimos veículos, mas reparei na Biblioteca de Anúncios da Meta que vocês não estão rodando campanhas ativas hoje. Estamos ajudando lojas de seminovos a receberem leads qualificados querendo financiar ou trocar de carro direto no WhatsApp. Faz sentido conversarmos 2 minutinhos?"
+          },
+          {
+            "id": "automotivo-oficina",
+            "name": "Oficina Mecânica & Centro Automotivo",
+            "category": "Automotivo",
+            "keywords": [
+              "oficina mecanica",
+              "centro automotivo",
+              "cambio automatico",
+              "injecao eletronica"
+            ],
+            "defaultMessage": "Olá, {nome}! Vi a estrutura da @{username} no Instagram, parabéns pelo trabalho! Verifiquei na Biblioteca da Meta e vi que vocês não estão com anúncios ativos no momento. Nós ajudamos centros automotivos a lotarem a agenda da semana com serviços de maior ticket. Posso te mandar um áudio rápido explicando como funciona?"
+          },
+          {
+            "id": "automotivo-som-pelicula",
+            "name": "Insulfilm, Som & Acessórios Automotivos",
+            "category": "Automotivo",
+            "keywords": [
+              "insulfilm",
+              "pelicula automotiva",
+              "som automotivo",
+              "envelopamento automotivo"
+            ],
+            "defaultMessage": "Tudo bem, {nome}? Vi os projetos da @{username} no Instagram! Notei que vocês não estão anunciando na Biblioteca da Meta agora. Temos uma estratégia específica para estética e acessórios automotivos que traz orçamentos diários no WhatsApp. Posso te explicar como aplicamos na sua região?"
+          },
+          {
+            "id": "clinica-odontologia",
+            "name": "Clínicas Odontológicas & Estética",
+            "category": "Saúde & Estética",
+            "keywords": [
+              "clinica odontologica",
+              "implantes dentarios",
+              "lentes de contato dental",
+              "harmonizacao facial"
+            ],
+            "defaultMessage": "Olá, {nome}! Vi o perfil @{username} no Instagram e achei excelente a estrutura da clínica. Notei na Biblioteca da Meta que vocês não estão com campanhas ativas hoje. Posso te mostrar como geramos agendamentos de avaliação pelo WhatsApp?"
+          },
+          {
+            "id": "imobiliaria-corretores",
+            "name": "Imobiliárias & Alto Padrão",
+            "category": "Imobiliário",
+            "keywords": [
+              "imobiliaria",
+              "imoveis alto padrao",
+              "construtora",
+              "lancamentos imobiliarios"
+            ],
+            "defaultMessage": "Olá, {nome}! Vi o portfólio da @{username} no Instagram. Reparei que vocês não estão rodando tráfego ativo na Biblioteca da Meta hoje. Posso te mostrar como estamos captando compradores qualificados para imóveis na região?"
+          }
+        ],
+        "trigger": {
+          "limit": 10,
+          "enabled": true,
+          "keyword": "seminovos, carros, automoveis, automovel,sonho",
+          "nicheId": "lojas-de-seminovos",
+          "location": "Petrolina - PE",
+          "lastRunAt": null,
+          "nextRunAt": "2026-10-25T01:17:44.381Z",
+          "intervalHours": 6,
+          "autoSendDataCrazy": true
+        },
+        "apifyConnected": true,
+        "selectedNicheId": "lojas-de-seminovos",
+        "autoSendDataCrazy": false,
+        "supabaseConnected": true,
+        "datacrazyWebhookUrl": "https://api.datacrazy.io/v1/crm/api/crm/integrations/webhook/business/20b9067e-7869-41f7-9adb-feda98b7d4a4"
+      }
+    }
+  ]
 }

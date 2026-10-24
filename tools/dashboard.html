@@ -1004,8 +1004,8 @@
 
     <!-- Banner de Busca Ativa -->
     <div id="loadingBanner" style="display:none;margin-bottom:22px;padding:22px;border-radius:16px;background:linear-gradient(135deg,#17152a 0%,#211d43 100%);color:#fff;text-align:center;">
-      <p style="font:700 15px Inter,sans-serif;color:#c4b5fd;margin-bottom:6px;">⚡ Busca Ultra-Rápida em andamento (100% perfis reais e ativos)...</p>
-      <p style="font:400 12px Inter,sans-serif;color:#bdb8dc;">Levamos apenas 10 a 15 segundos para capturar perfis válidos do Instagram e validar na Biblioteca da Meta em segundo plano.</p>
+      <p style="font:700 15px Inter,sans-serif;color:#c4b5fd;margin-bottom:6px;">⚡ Busca Nativa Ultra-Rápida em andamento (100% perfis reais e ativos)...</p>
+      <p style="font:400 12px Inter,sans-serif;color:#bdb8dc;">Buscando perfis reais do nicho no Instagram em alta velocidade (1 a 3 segundos), sem depender de serviços externos lentos.</p>
     </div>
 
     <!-- Cabeçalho da Fila de Leads -->
@@ -1434,6 +1434,24 @@
       return fetch(url, Object.assign({}, options, { headers }));
     }
 
+    async function apiFetchJson(url, options = {}) {
+      const res = await apiFetch(url, options);
+      const text = await res.text();
+      let data = null;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        if (!res.ok) {
+          throw new Error(`Servidor ocupado (${res.status}). Tente novamente em instantes.`);
+        }
+        throw new Error('Resposta inválida do servidor.');
+      }
+      if (!res.ok && data && data.error) {
+        throw new Error(data.error);
+      }
+      return data;
+    }
+
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -1580,12 +1598,11 @@
       if (runPreSearch) info.style.display = 'block';
 
       try {
-        const res = await apiFetch('/api/auth/onboarding', {
+        const data = await apiFetchJson('/api/auth/onboarding', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ interestedNiche, targetKeywords, targetCity, runPreSearch })
         });
-        const data = await res.json();
         if (data.ok) {
           STATE.user = data.user;
           STATE.config = data.config;
@@ -1598,15 +1615,15 @@
           renderKPIs();
           renderLeads();
           showScreen('dashboard');
-          showToast(`Pronto! Nicho "${interestedNiche}" salvo com ${STATE.leads.length} leads válidos.`);
+          showToast(`Pronto! Nicho "${interestedNiche}" configurado com sucesso.`);
           if (runPreSearch) {
-            setTimeout(fetchState, 22000);
+            setTimeout(fetchState, 5000);
           }
         } else {
           showToast('Erro no pré-formulário: ' + (data.error || 'Tente novamente'));
         }
       } catch (e) {
-        showToast('Erro ao salvar pré-formulário: ' + e.message);
+        showToast('Aviso no formulário: ' + e.message);
       } finally {
         btn.disabled = false;
         info.style.display = 'none';
@@ -1923,24 +1940,22 @@
       banner.style.display = 'block';
 
       try {
-        const res = await apiFetch('/api/prospect', {
+        const data = await apiFetchJson('/api/prospect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nicheId, keyword, location, limit, autoSendDataCrazy })
         });
-        const data = await res.json();
-        if (!res.ok || !data.ok) {
-          showToast('Erro na busca: ' + (data.error || 'Verifique a conexão'));
+        if (!data.ok) {
+          showToast('Erro na busca: ' + (data.error || 'Verifique os dados informados'));
         } else {
           STATE.leads = data.leads;
           STATE.history = data.history;
           renderKPIs();
           renderLeads();
-          showToast(`⚡ ${data.newLeadsCount} perfis 100% válidos capturados! Validando Biblioteca Meta em 2º plano...`);
-          setTimeout(fetchState, 22000);
+          showToast(`⚡ ${data.newLeadsCount} perfis 100% válidos capturados via Motor Nativo!`);
         }
       } catch (e) {
-        showToast('Erro ao consultar servidor: ' + e.message);
+        showToast('Aviso na busca: ' + e.message);
       } finally {
         btn.disabled = false;
         banner.style.display = 'none';

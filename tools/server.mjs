@@ -13,6 +13,7 @@ import {
   buildProspectLead,
   sendLeadToDataCrazy
 } from './prospector_engine.mjs';
+import { searchInstagramProfilesNative } from './native_search_engine.mjs';
 import {
   getWhatsAppStatus,
   startWhatsAppQrSession,
@@ -652,13 +653,10 @@ async function verifyMetaAdsInBackground(userId, validProfiles, nicheObj, cleanL
   }
 }
 
-// Motor centralizado de execução de prospecção ULTRA-RÁPIDA (Google Instagram Index + Validação de Links Reais)
+// Motor centralizado de execução de prospecção NATIVA & RÁPIDA (Bing/DDG Web Index + Fallback Apify Opcional)
 async function executeProspectingRun({ userId = 'user-salles', nicheId, keyword, location, limit, autoSendDataCrazy, source = 'manual' }) {
   const env = loadEnv();
-  const token = env.APIFY_API_TOKEN;
-  if (!token) {
-    throw new Error('Token da Apify não encontrado no .env');
-  }
+  const token = env.APIFY_API_TOKEN || '';
 
   const { usersDb, user } = getUserContext({ headers: {} }, userId);
   const config = user.config;
@@ -670,45 +668,60 @@ async function executeProspectingRun({ userId = 'user-salles', nicheId, keyword,
   const searchQuery = cityClean ? `${rawKeyword} ${cityClean}` : rawKeyword;
   const parsedLimit = Math.min(Math.max(Number(limit) || 6, 1), 15);
 
-  // 1. BUSCA ULTRA-RÁPIDA (~12s) via apify/google-search-scraper filtrando apenas perfis raiz válidos do Instagram!
-  const googleQuery = `site:instagram.com ${searchQuery}`;
   let candidateProfiles = [];
 
+  // 1. MOTOR NATIVO PRINCIPAL (Responde em ~800ms a 1.5s sem precisar de Apify nem de token!)
   try {
-    const gResp = await fetch(`https://api.apify.com/v2/acts/apify~google-search-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        queries: googleQuery,
-        maxPagesPerQuery: 1,
-        resultsPerPage: Math.min(parsedLimit * 4, 30),
-        countryCode: 'br',
-        languageCode: 'pt-BR'
-      })
-    });
-
-    if (gResp.ok) {
-      const gData = await gResp.json();
-      candidateProfiles = parseGoogleInstagramResults(gData);
-    }
-  } catch (gErr) {
-    console.error('Aviso na busca rápida Google Instagram:', gErr.message);
+    candidateProfiles = await searchInstagramProfilesNative(searchQuery, parsedLimit * 2);
+    console.log(`[Busca Nativa] Encontrados ${candidateProfiles.length} perfis para: "${searchQuery}"`);
+  } catch (nativeErr) {
+    console.error('[Busca Nativa Erro]:', nativeErr.message);
   }
 
-  // Fallback para instagram-search-scraper somente se o Google trouxer zero resultados
-  if (candidateProfiles.length === 0) {
-    const igResp = await fetch(`https://api.apify.com/v2/acts/apify~instagram-search-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        search: searchQuery,
-        searchType: 'user',
-        searchLimit: Math.min(parsedLimit * 2, 16)
-      })
-    });
-    if (igResp.ok) {
-      const igData = await igResp.json();
-      candidateProfiles = Array.isArray(igData) ? igData : [];
+  // 2. Fallback Apify (apenas se a busca nativa não encontrar nada E o usuário tiver token configurado)
+  if (candidateProfiles.length === 0 && token) {
+    try {
+      const googleQuery = `site:instagram.com ${searchQuery}`;
+      const gResp = await fetch(`https://api.apify.com/v2/acts/apify~google-search-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          queries: googleQuery,
+          maxPagesPerQuery: 1,
+          resultsPerPage: Math.min(parsedLimit * 4, 30),
+          countryCode: 'br',
+          languageCode: 'pt-BR'
+        }),
+        signal: AbortSignal.timeout(12000)
+      });
+
+      if (gResp.ok) {
+        const gData = await gResp.json();
+        candidateProfiles = parseGoogleInstagramResults(gData);
+      }
+    } catch (gErr) {
+      console.error('Aviso no fallback Apify Google Search:', gErr.message);
+    }
+  }
+
+  if (candidateProfiles.length === 0 && token) {
+    try {
+      const igResp = await fetch(`https://api.apify.com/v2/acts/apify~instagram-search-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          search: searchQuery,
+          searchType: 'user',
+          searchLimit: Math.min(parsedLimit * 2, 16)
+        }),
+        signal: AbortSignal.timeout(12000)
+      });
+      if (igResp.ok) {
+        const igData = await igResp.json();
+        candidateProfiles = Array.isArray(igData) ? igData : [];
+      }
+    } catch (igErr) {
+      console.error('Aviso no fallback Apify Instagram Search:', igErr.message);
     }
   }
 
