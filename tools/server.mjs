@@ -494,23 +494,17 @@ function sendJson(res, status, obj) {
 // SISTEMA MULTI-USUÁRIO (Login + Isolamento de Pesquisa + Onboarding Inicial)
 // ============================================================================
 function loadUsersDb() {
-  const baseDb = loadDatabase();
   const baseCfg = loadConfig();
   const defaultSallesUser = {
     id: 'user-salles',
     name: 'Istêfano Salles',
     email: 'salles@salles.ia',
     password: '123',
-    onboardingCompleted: true,
-    preferences: {
-      category: 'Automotivo',
-      nicheName: 'Loja de Veículos & Seminovos',
-      keyword: 'seminovos',
-      location: 'Petrolina - PE'
-    },
-    leads: baseDb.leads || [],
-    history: baseDb.history || [],
-    deletedUsernames: baseDb.deletedUsernames || [],
+    onboardingCompleted: false,
+    preferences: {},
+    leads: [],
+    history: [],
+    deletedUsernames: [],
     config: baseCfg
   };
 
