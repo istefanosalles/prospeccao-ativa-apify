@@ -834,6 +834,9 @@
           <i></i>
           Supabase Conectado
         </span>
+        <button id="waTopbarBtn" onclick="openWaAutoModal()" class="btn-pill-soft" style="background:#f5efff;border-color:#d7c4f3;color:#5a3cc0;">
+          📲 Disparador WhatsApp
+        </button>
         <button id="triggerStatusBtn" onclick="openTriggerModal()" class="btn-pill-soft">⚡ Gatilho: Manual</button>
         <button onclick="openNewNicheModal()" class="btn-pill-soft">+ Novo Nicho</button>
         <span style="padding:8px 13px;border-radius:999px;background:#f5efff;border:0.8px solid #d7c4f3;color:#5a3cc0;font:600 12px/1 'Inter',sans-serif;">
@@ -1130,12 +1133,293 @@
     </div>
   </div>
 
+  <!-- Modal Disparador Automático de WhatsApp (QR Code + Fila Anti-Bloqueio + API Nuvem) -->
+  <div id="waAutoModal" class="quiz-overlay">
+    <div class="quiz-dialog" style="max-width:560px;max-height:92vh;overflow-y:auto;">
+      <span class="scribble">Envio Automático sem abrir o WhatsApp</span>
+      <h3 style="margin:0 0 8px;font:700 22px/1.1 Inter,sans-serif;letter-spacing:-0.06em;color:#292929;">
+        Disparador Automático <em>de WhatsApp</em>
+      </h3>
+      <p style="margin:0 0 16px;font:400 12px/1.45 Inter,sans-serif;color:#5c5c5c;">
+        Conecte seu WhatsApp lendo o QR Code abaixo (100% grátis no servidor local) ou configure uma API externa. Depois, envie em 1 clique em cada card ou dispare a fila inteira com delay anti-bloqueio!
+      </p>
+
+      <!-- Bloco 1: Conexão por QR Code -->
+      <div style="padding:15px;border-radius:14px;background:#fff;border:0.8px solid #d7c4f3;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+          <div>
+            <strong style="display:block;font:700 13px Inter,sans-serif;color:#242424;">1. Conexão Direta por QR Code</strong>
+            <span id="waModalStatusText" style="font:500 11.5px Inter,sans-serif;color:#636363;">Status: Verificando conexão...</span>
+          </div>
+          <div style="display:flex;gap:7px;">
+            <button id="waGenQrBtn" type="button" onclick="connectWaQr()" class="btn-codex-primary" style="padding:9px 15px;font-size:12px;">
+              Gerar QR Code
+            </button>
+            <button id="waDiscBtn" type="button" onclick="disconnectWaQr()" class="tab-btn" style="display:none;padding:9px 13px;font-size:11px;color:#b42318;">
+              Desconectar
+            </button>
+          </div>
+        </div>
+
+        <div id="waQrBox" style="display:none;text-align:center;padding:14px;border-radius:12px;background:#f8f8f6;border:1px dashed #b9a0ec;">
+          <img id="waQrImg" src="" alt="QR Code WhatsApp" style="width:220px;height:220px;border-radius:12px;background:#fff;padding:8px;border:1px solid #e0e0dc;" />
+          <p style="margin:8px 0 0;font:500 11.5px Inter,sans-serif;color:#5a3cc0;">
+            Abra o WhatsApp no celular → <b>Aparelhos Conectados</b> → <b>Conectar Aparelho</b> e aponte a câmera!
+          </p>
+        </div>
+      </div>
+
+      <!-- Bloco 2: Fila Automática com Delay Anti-Bloqueio -->
+      <div style="padding:15px;border-radius:14px;background:#f5efff;border:0.8px solid #d7c4f3;margin-bottom:14px;">
+        <strong style="display:block;font:700 13px Inter,sans-serif;color:#242424;margin-bottom:6px;">
+          2. Fila de Disparo em Lote (com Delay Humano Anti-Bloqueio)
+        </strong>
+        <p style="margin:0 0 12px;font:400 11.5px Inter,sans-serif;color:#5c5c5c;">
+          O sistema simula <i>"Digitando..."</i> por 2 segundos antes de cada mensagem e aguarda um tempo aleatório entre um lead e outro para proteger seu número.
+        </p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 4px 2px;font:600 11px Inter,sans-serif;color:#525252;">Delay Mínimo (segundos)</span>
+            <input id="waDelayMin" type="number" value="25" min="8" max="300" class="clean-input" style="width:100%;background:#fff;" />
+          </label>
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 4px 2px;font:600 11px Inter,sans-serif;color:#525252;">Delay Máximo (segundos)</span>
+            <input id="waDelayMax" type="number" value="45" min="15" max="600" class="clean-input" style="width:100%;background:#fff;" />
+          </label>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="waStartBulkBtn" type="button" onclick="startAutoBulkSend()" class="btn-codex-primary" style="flex:1;padding:12px 16px;font-size:12.5px;">
+            🚀 Disparar Fila Automática (Prioridade Alta c/ WhatsApp)
+          </button>
+          <button id="waStopBulkBtn" type="button" onclick="stopAutoBulkSend()" class="tab-btn" style="display:none;background:#fff5f5;border-color:#fecdca;color:#b42318;">
+            ⏹️ Parar Fila
+          </button>
+        </div>
+
+        <div id="waQueueLogBox" style="display:none;margin-top:12px;padding:10px 12px;border-radius:10px;background:#17152a;color:#e4e0ff;font:500 11px/1.45 monospace;max-height:130px;overflow-y:auto;"></div>
+      </div>
+
+      <!-- Bloco 3: API na Nuvem Opcional (Evolution / Z-API / Webhook) -->
+      <details style="padding:12px 14px;border-radius:12px;background:#fff;border:0.8px solid #e0e0dc;">
+        <summary style="font:600 12px Inter,sans-serif;color:#525252;cursor:pointer;">
+          ⚙️ Opcional: Usar API de WhatsApp na Nuvem (Evolution API / Z-API / Webhook)
+        </summary>
+        <div style="display:grid;gap:10px;margin-top:12px;">
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 4px 2px;font:600 11px Inter,sans-serif;color:#636363;">URL do Endpoint de Envio (POST)</span>
+            <input id="waApiUrl" type="text" placeholder="Ex: https://sua-evolution.com/message/sendText/instancia" class="clean-input" style="width:100%;" />
+          </label>
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 4px 2px;font:600 11px Inter,sans-serif;color:#636363;">API Key / Token (Opcional)</span>
+            <input id="waApiToken" type="password" placeholder="Seu token da API" class="clean-input" style="width:100%;" />
+          </label>
+          <button type="button" onclick="saveWaCloudConfig()" class="tab-btn" style="justify-self:start;">Salvar API na Nuvem</button>
+        </div>
+      </details>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px;">
+        <button type="button" onclick="closeWaAutoModal()" class="tab-btn">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
 
   <script>
     let STATE = { user: null, leads: [], history: [], config: { niches: [], selectedNicheId: '' } };
     let ACTIVE_TAB = 'prioridade_alta';
     let CURRENT_USER_ID = sessionStorage.getItem('salles_prospector_active_user_id') || '';
+    let WA_POLL_TIMER = null;
+
+    async function refreshWaStatus(silent = false) {
+      try {
+        const res = await apiFetch('/api/whatsapp/status');
+        const data = await res.json();
+        if (!data.ok) return;
+
+        const topBtn = document.getElementById('waTopbarBtn');
+        const st = data.state || {};
+        const q = data.queue || {};
+
+        if (topBtn) {
+          if (st.status === 'connected') {
+            topBtn.textContent = `🟢 WhatsApp Conectado (${st.connectedPhone || 'Ativo'})`;
+            topBtn.style.background = '#ecfdf3';
+            topBtn.style.borderColor = '#abefc6';
+            topBtn.style.color = '#067647';
+          } else if (q.running) {
+            topBtn.textContent = `🚀 Enviando Fila (${q.sent}/${q.total})`;
+          } else {
+            topBtn.textContent = '📲 Disparador WhatsApp';
+            topBtn.style.background = '#f5efff';
+            topBtn.style.borderColor = '#d7c4f3';
+            topBtn.style.color = '#5a3cc0';
+          }
+        }
+
+        const statusTxt = document.getElementById('waModalStatusText');
+        const qrBox = document.getElementById('waQrBox');
+        const qrImg = document.getElementById('waQrImg');
+        const genBtn = document.getElementById('waGenQrBtn');
+        const discBtn = document.getElementById('waDiscBtn');
+
+        if (statusTxt) {
+          if (st.status === 'connected') {
+            statusTxt.innerHTML = `<b style="color:#067647;">🟢 Conectado no número ${st.connectedPhone} (${st.connectedName})</b>`;
+            qrBox.style.display = 'none';
+            genBtn.style.display = 'none';
+            discBtn.style.display = 'inline-flex';
+          } else if (st.status === 'qr_ready' && st.qrDataUrl) {
+            statusTxt.innerHTML = `<b style="color:#5a3cc0;">📸 Escaneie o QR Code abaixo com seu WhatsApp:</b>`;
+            qrImg.src = st.qrDataUrl;
+            qrBox.style.display = 'block';
+            genBtn.textContent = 'Atualizar QR Code';
+            genBtn.style.display = 'inline-flex';
+            discBtn.style.display = 'none';
+          } else if (st.status === 'connecting') {
+            statusTxt.textContent = '⏳ Gerando sessão segura com o WhatsApp... aguarde alguns segundos.';
+          } else {
+            statusTxt.textContent = st.lastError
+              ? `Desconectado (${st.lastError})`
+              : (data.isVercel
+                ? 'Modo Nuvem Vercel: para usar o QR Code grátis, abra em http://localhost:3099 ou configure uma API externa abaixo.'
+                : 'Desconectado. Clique em "Gerar QR Code" ao lado para conectar seu WhatsApp!');
+            qrBox.style.display = 'none';
+            genBtn.textContent = 'Gerar QR Code';
+            genBtn.style.display = 'inline-flex';
+            discBtn.style.display = 'none';
+          }
+        }
+
+        const logBox = document.getElementById('waQueueLogBox');
+        const stopBtn = document.getElementById('waStopBulkBtn');
+        if (logBox && Array.isArray(q.logs) && q.logs.length > 0) {
+          logBox.style.display = 'block';
+          logBox.innerHTML = q.logs.slice(0, 15).map((l) => `<div>${l}</div>`).join('');
+        }
+        if (stopBtn) {
+          stopBtn.style.display = q.running ? 'inline-flex' : 'none';
+        }
+      } catch {}
+    }
+
+    function openWaAutoModal() {
+      document.getElementById('waAutoModal').style.display = 'flex';
+      refreshWaStatus();
+      if (WA_POLL_TIMER) clearInterval(WA_POLL_TIMER);
+      WA_POLL_TIMER = setInterval(() => refreshWaStatus(true), 2500);
+    }
+
+    function closeWaAutoModal() {
+      document.getElementById('waAutoModal').style.display = 'none';
+      if (WA_POLL_TIMER) {
+        clearInterval(WA_POLL_TIMER);
+        WA_POLL_TIMER = null;
+      }
+    }
+
+    async function connectWaQr() {
+      const btn = document.getElementById('waGenQrBtn');
+      btn.disabled = true;
+      btn.textContent = 'Gerando QR Code...';
+      try {
+        const res = await apiFetch('/api/whatsapp/connect', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          showToast('Erro ao gerar QR Code: ' + (data.error || 'Tente novamente'));
+        }
+        await refreshWaStatus();
+      } catch (e) {
+        showToast('Erro ao conectar: ' + e.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function disconnectWaQr() {
+      await apiFetch('/api/whatsapp/disconnect', { method: 'POST' });
+      await refreshWaStatus();
+      showToast('WhatsApp desconectado.');
+    }
+
+    async function saveWaCloudConfig() {
+      const apiUrl = document.getElementById('waApiUrl').value.trim();
+      const apiToken = document.getElementById('waApiToken').value.trim();
+      const delayMinSec = Number(document.getElementById('waDelayMin').value) || 25;
+      const delayMaxSec = Number(document.getElementById('waDelayMax').value) || 45;
+      const res = await apiFetch('/api/whatsapp/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiUrl, apiToken, delayMinSec, delayMaxSec })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('Configuração de API e Delays salva com sucesso!');
+      }
+    }
+
+    async function sendAutoSingleLead(leadId) {
+      const btn = document.getElementById(`autoSendBtn_${leadId}`);
+      const msgEl = document.getElementById(`msg_${leadId}`);
+      const message = msgEl ? msgEl.value.trim() : '';
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Digitando...';
+      }
+
+      try {
+        const res = await apiFetch('/api/whatsapp/send-single', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ leadId, message })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          showToast(data.error || 'Conecte o WhatsApp primeiro!');
+          openWaAutoModal();
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = '⚡ Enviar Automático';
+          }
+          return;
+        }
+        STATE.leads = data.leads;
+        renderLeads();
+        showToast(`✅ 1ª mensagem enviada automaticamente para @${data.lead.instagram.username}!`);
+      } catch (e) {
+        showToast('Erro no envio automático: ' + e.message);
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '⚡ Enviar Automático';
+        }
+      }
+    }
+
+    async function startAutoBulkSend() {
+      const delayMinSec = Number(document.getElementById('waDelayMin').value) || 25;
+      const delayMaxSec = Number(document.getElementById('waDelayMax').value) || 45;
+
+      const res = await apiFetch('/api/whatsapp/send-bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ delayMinSec, delayMaxSec, onlyHighPriority: true, skipAlreadySent: true })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        return showToast(data.error || 'Erro ao iniciar fila.');
+      }
+      showToast(`🚀 Fila iniciada para ${data.queue.total} leads com delay de ${delayMinSec}s a ${delayMaxSec}s!`);
+      await refreshWaStatus();
+    }
+
+    async function stopAutoBulkSend() {
+      await apiFetch('/api/whatsapp/stop-bulk', { method: 'POST' });
+      await refreshWaStatus();
+      showToast('⏹️ Fila de disparo interrompida.');
+    }
 
     function showScreen(screenName) {
       document.getElementById('loginScreenView').style.display = screenName === 'login' ? 'flex' : 'none';
@@ -1178,6 +1462,7 @@
       updateTriggerBadge();
       renderKPIs();
       renderLeads();
+      refreshWaStatus(true);
 
       if (STATE.user && STATE.user.onboardingCompleted === false) {
         showScreen('onboarding');
@@ -1590,11 +1875,23 @@
                 class="btn-whatsapp-codex"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                <span>${hasWa ? 'Chamar no WhatsApp' : 'Abordar no Instagram'}</span>
+                <span>${hasWa ? 'Abrir WhatsApp' : 'Abordar no Instagram'}</span>
               </a>
 
-              <button onclick="sendSingleToDataCrazy('${lead.id}')" class="btn-pill-soft" style="padding:11px 15px;">
-                ${lead.contact.datacrazy_synced ? 'Reenviar ao DataCrazy' : 'Enviar p/ DataCrazy'}
+              ${hasWa
+                ? `<button
+                    type="button"
+                    id="autoSendBtn_${lead.id}"
+                    onclick="sendAutoSingleLead('${lead.id}')"
+                    class="btn-pill-soft"
+                    style="padding:11px 14px;background:${lead.pipeline_status === 'enviado_automatico' ? '#ecfdf3' : '#f5efff'};border-color:${lead.pipeline_status === 'enviado_automatico' ? '#abefc6' : '#c4b5fd'};color:${lead.pipeline_status === 'enviado_automatico' ? '#067647' : '#5a3cc0'};font-weight:700;"
+                  >
+                    ${lead.pipeline_status === 'enviado_automatico' ? '✅ Enviado Auto' : '⚡ Enviar Automático'}
+                  </button>`
+                : ''}
+
+              <button onclick="sendSingleToDataCrazy('${lead.id}')" class="btn-pill-soft" style="padding:11px 14px;">
+                ${lead.contact.datacrazy_synced ? 'Reenviar DataCrazy' : 'Enviar p/ DataCrazy'}
               </button>
 
               <button

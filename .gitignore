@@ -5,6 +5,7 @@ node_modules/
 .tmp/last_ig_search.json
 .tmp/last_meta_ads_check.json
 .tmp/test_ig_profiles.json
+.tmp/wa_qr_session/
 
 .vercel
 .env*

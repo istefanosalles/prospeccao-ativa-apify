@@ -13,6 +13,14 @@ import {
   buildProspectLead,
   sendLeadToDataCrazy
 } from './prospector_engine.mjs';
+import {
+  getWhatsAppStatus,
+  startWhatsAppQrSession,
+  disconnectWhatsApp,
+  sendWhatsAppDirectMessage,
+  startBulkQueue,
+  stopBulkQueue
+} from './whatsapp_sender.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1189,6 +1197,150 @@ export async function requestHandler(req, res) {
     }
   }
 
+  // ==========================================================================
+  // WHATSAPP AUTO-SENDER (QR CODE INTEGRADO + FILA COM DELAY ANTI-BLOQUEIO)
+  // ==========================================================================
+  if (pathname === '/api/whatsapp/status' && req.method === 'GET') {
+    const { user } = getUserContext(req);
+    const waStatus = getWhatsAppStatus();
+    return sendJson(res, 200, {
+      ok: true,
+      isVercel: IS_VERCEL,
+      ...waStatus,
+      whatsappConfig: (user && user.config && user.config.whatsappConfig) || {
+        apiUrl: '',
+        apiToken: '',
+        delayMinSec: 25,
+        delayMaxSec: 45
+      }
+    });
+  }
+
+  if (pathname === '/api/whatsapp/connect' && req.method === 'POST') {
+    try {
+      const authDir = path.join(TMP_DIR, 'wa_qr_session');
+      await startWhatsAppQrSession(authDir);
+      // Aguarda até 4.5s para o QR Code ser gerado na primeira chamada
+      for (let i = 0; i < 18; i++) {
+        const cur = getWhatsAppStatus().state;
+        if (cur.status === 'qr_ready' || cur.status === 'connected') break;
+        await new Promise((r) => setTimeout(r, 250));
+      }
+      return sendJson(res, 200, { ok: true, ...getWhatsAppStatus() });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
+  }
+
+  if (pathname === '/api/whatsapp/disconnect' && req.method === 'POST') {
+    try {
+      const authDir = path.join(TMP_DIR, 'wa_qr_session');
+      await disconnectWhatsApp(authDir);
+      return sendJson(res, 200, { ok: true, ...getWhatsAppStatus() });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
+  }
+
+  if (pathname === '/api/whatsapp/config' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      const { usersDb, user } = getUserContext(req);
+      if (!user) return sendJson(res, 401, { ok: false, error: 'Faça login primeiro.' });
+      user.config = user.config || loadConfig();
+      user.config.whatsappConfig = {
+        apiUrl: String(body.apiUrl || '').trim(),
+        apiToken: String(body.apiToken || '').trim(),
+        delayMinSec: Math.max(8, Number(body.delayMinSec) || 25),
+        delayMaxSec: Math.max(15, Number(body.delayMaxSec) || 45)
+      };
+      saveUsersDb(usersDb);
+      return sendJson(res, 200, { ok: true, whatsappConfig: user.config.whatsappConfig });
+    } catch (err) {
+      return sendJson(res, 400, { ok: false, error: err.message });
+    }
+  }
+
+  if (pathname === '/api/whatsapp/send-single' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      const { usersDb, user } = getUserContext(req);
+      if (!user) return sendJson(res, 401, { ok: false, error: 'Faça login primeiro.' });
+      const lead = user.leads.find((l) => l.id === body.leadId);
+      if (!lead) return sendJson(res, 404, { ok: false, error: 'Lead não encontrado.' });
+
+      const customMsg = body.message ? String(body.message).trim() : lead.contact.personalized_message;
+      const customPhone = body.phone ? String(body.phone).trim() : lead.contact.whatsapp_number;
+
+      const sendRes = await sendWhatsAppDirectMessage({
+        phone: customPhone,
+        message: customMsg,
+        apiConfig: (user.config && user.config.whatsappConfig) || {}
+      });
+
+      lead.pipeline_status = 'enviado_automatico';
+      lead.contact.last_sent_at = new Date().toISOString();
+      saveUsersDb(usersDb);
+
+      return sendJson(res, 200, {
+        ok: true,
+        sendRes,
+        lead,
+        leads: user.leads
+      });
+    } catch (err) {
+      return sendJson(res, 400, { ok: false, error: err.message });
+    }
+  }
+
+  if (pathname === '/api/whatsapp/send-bulk' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      const { usersDb, user } = getUserContext(req);
+      if (!user) return sendJson(res, 401, { ok: false, error: 'Faça login primeiro.' });
+
+      const waCfg = (user.config && user.config.whatsappConfig) || {};
+      const delayMinSec = Number(body.delayMinSec || waCfg.delayMinSec || 25);
+      const delayMaxSec = Number(body.delayMaxSec || waCfg.delayMaxSec || 45);
+      const onlyHighPriority = body.onlyHighPriority !== false;
+
+      let targetLeads = (user.leads || []).filter((l) => Boolean(l.contact?.whatsapp_number));
+      if (onlyHighPriority) {
+        targetLeads = targetLeads.filter((l) => !l.meta_ads?.in_ad_library);
+      }
+      if (body.skipAlreadySent !== false) {
+        targetLeads = targetLeads.filter((l) => l.pipeline_status !== 'enviado_automatico');
+      }
+
+      const queueState = await startBulkQueue({
+        leads: targetLeads,
+        delayMinSec,
+        delayMaxSec,
+        apiConfig: waCfg,
+        onLeadSent: async (sentLeadId) => {
+          const freshCtx = getUserContext(req, user.id);
+          if (freshCtx.user) {
+            const found = freshCtx.user.leads.find((x) => x.id === sentLeadId);
+            if (found) {
+              found.pipeline_status = 'enviado_automatico';
+              found.contact.last_sent_at = new Date().toISOString();
+              saveUsersDb(freshCtx.usersDb);
+            }
+          }
+        }
+      });
+
+      return sendJson(res, 200, { ok: true, queue: queueState });
+    } catch (err) {
+      return sendJson(res, 400, { ok: false, error: err.message });
+    }
+  }
+
+  if (pathname === '/api/whatsapp/stop-bulk' && req.method === 'POST') {
+    const queue = stopBulkQueue();
+    return sendJson(res, 200, { ok: true, queue });
+  }
+
   // Endpoint para Vercel Cron / Gatilho Externo
   if (pathname === '/api/cron' && req.method === 'GET') {
     try {
@@ -1250,5 +1402,9 @@ if (!IS_VERCEL) {
 
   server.listen(PORT, () => {
     console.log(`🚀 [V.L.A.E.G. Server] Rodando em http://localhost:${PORT}`);
+    const savedWaCreds = path.join(TMP_DIR, 'wa_qr_session', 'creds.json');
+    if (fs.existsSync(savedWaCreds)) {
+      startWhatsAppQrSession(path.join(TMP_DIR, 'wa_qr_session')).catch(() => {});
+    }
   });
 }
