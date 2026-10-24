@@ -715,7 +715,7 @@
       <form id="authLoginForm" onsubmit="event.preventDefault(); submitLogin();" style="display:grid;gap:14px;">
         <label style="display:block;">
           <span style="display:block;margin:0 0 6px 2px;font:600 11px 'Inter',sans-serif;color:#525252;">Seu E-mail</span>
-          <input id="loginEmail" type="email" required placeholder="Digite seu e-mail (ex: salles@salles.ia)" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
+          <input id="loginEmail" type="email" required placeholder="Digite seu e-mail" class="clean-input" style="width:100%;padding:13px 14px;font-size:13px;" />
         </label>
 
         <label style="display:block;">
@@ -1164,12 +1164,16 @@
       }
       const res = await apiFetch('/api/state');
       STATE = await res.json();
-      if (STATE.user) {
-        CURRENT_USER_ID = STATE.user.id;
-        sessionStorage.setItem('salles_prospector_active_user_id', CURRENT_USER_ID);
-        const lbl = document.getElementById('currentUserNameLabel');
-        if (lbl) lbl.textContent = STATE.user.name;
+      if (!STATE.user) {
+        CURRENT_USER_ID = '';
+        sessionStorage.removeItem('salles_prospector_active_user_id');
+        showScreen('login');
+        return;
       }
+      CURRENT_USER_ID = STATE.user.id;
+      sessionStorage.setItem('salles_prospector_active_user_id', CURRENT_USER_ID);
+      const lbl = document.getElementById('currentUserNameLabel');
+      if (lbl) lbl.textContent = STATE.user.name;
       populateNiches();
       updateTriggerBadge();
       renderKPIs();

@@ -163,7 +163,7 @@ async function pullUsersFromSupabaseIfConfigured(force = false) {
     });
     if (!resp.ok) return;
     const rows = await resp.json();
-    if (Array.isArray(rows) && rows.length > 0) {
+    if (Array.isArray(rows)) {
       const users = rows.map((r) => ({
         id: r.id,
         name: r.name,
@@ -177,10 +177,6 @@ async function pullUsersFromSupabaseIfConfigured(force = false) {
         config: r.config || loadConfig()
       }));
       fs.writeFileSync(USERS_DB_PATH, JSON.stringify({ users }, null, 2), 'utf-8');
-    } else if (Array.isArray(rows) && rows.length === 0) {
-      // Banco recém-criado no Supabase: envia a carga inicial
-      const localDb = loadUsersDb();
-      await syncUsersToSupabase(localDb);
     }
   } catch (err) {
     console.warn('Aviso ao ler do Supabase:', err.message);
@@ -494,33 +490,19 @@ function sendJson(res, status, obj) {
 // SISTEMA MULTI-USUÁRIO (Login + Isolamento de Pesquisa + Onboarding Inicial)
 // ============================================================================
 function loadUsersDb() {
-  const baseCfg = loadConfig();
-  const defaultSallesUser = {
-    id: 'user-salles',
-    name: 'Istêfano Salles',
-    email: 'salles@salles.ia',
-    password: '123',
-    onboardingCompleted: false,
-    preferences: {},
-    leads: [],
-    history: [],
-    deletedUsernames: [],
-    config: baseCfg
-  };
-
   if (!fs.existsSync(USERS_DB_PATH)) {
-    const initialUsers = { users: [defaultSallesUser] };
+    const initialUsers = { users: [] };
     fs.writeFileSync(USERS_DB_PATH, JSON.stringify(initialUsers, null, 2), 'utf-8');
     return initialUsers;
   }
   try {
     const parsed = JSON.parse(fs.readFileSync(USERS_DB_PATH, 'utf-8'));
-    if (!Array.isArray(parsed.users) || parsed.users.length === 0) {
-      parsed.users = [defaultSallesUser];
+    if (!Array.isArray(parsed.users)) {
+      parsed.users = [];
     }
     return parsed;
   } catch {
-    return { users: [defaultSallesUser] };
+    return { users: [] };
   }
 }
 
@@ -531,10 +513,13 @@ function saveUsersDb(usersDb) {
 
 function getUserContext(req, explicitUserId = '') {
   const usersDb = loadUsersDb();
-  const headerUserId = explicitUserId || req.headers['x-user-id'] || 'user-salles';
+  const headerUserId = explicitUserId || req.headers['x-user-id'] || '';
   let user = usersDb.users.find((u) => u.id === headerUserId);
   if (!user) {
-    user = usersDb.users[0];
+    user = usersDb.users[0] || null;
+  }
+  if (!user) {
+    return { usersDb, user: null };
   }
   const env = loadEnv();
   user.config = user.config || loadConfig();
@@ -998,6 +983,14 @@ export async function requestHandler(req, res) {
 
   if (pathname === '/api/state' && req.method === 'GET') {
     const { user } = getUserContext(req);
+    if (!user) {
+      return sendJson(res, 200, {
+        user: null,
+        leads: [],
+        history: [],
+        config: loadConfig()
+      });
+    }
     return sendJson(res, 200, {
       user: {
         id: user.id,
