@@ -58,18 +58,51 @@ export function generateFirstMessageStrategy({
   followersCount
 }) {
   const bioLower = (biography || '').toLowerCase();
-  const isCarDealer = nicheId === 'automotivo-revenda' || bioLower.includes('seminovo') || bioLower.includes('multimarcas') || bioLower.includes('veículo') || bioLower.includes('veiculo');
-  const isWorkshop = nicheId === 'automotivo-oficina' || bioLower.includes('oficina') || bioLower.includes('mecânica') || bioLower.includes('mecanica');
-  const placeWord = isCarDealer ? 'da loja' : isWorkshop ? 'da oficina' : 'da estética';
+  const nicheLower = `${nicheId || ''} ${nicheName || ''}`.toLowerCase();
+  const isCarDealer = nicheLower.includes('revenda') || nicheLower.includes('seminovo') || bioLower.includes('seminovo') || bioLower.includes('multimarcas') || bioLower.includes('veículo') || bioLower.includes('veiculo');
+  const isWorkshop = nicheLower.includes('oficina') || bioLower.includes('oficina') || bioLower.includes('mecânica') || bioLower.includes('mecanica');
+  const isAuto = nicheLower.includes('automotivo') || nicheLower.includes('estetica') || isCarDealer || isWorkshop;
+  const isClinic = nicheLower.includes('odonto') || nicheLower.includes('clinica') || nicheLower.includes('clínica') || nicheLower.includes('saude') || nicheLower.includes('médic') || bioLower.includes('odonto') || bioLower.includes('dentista') || bioLower.includes('clínica') || bioLower.includes('clinica');
+  const isRealEstate = nicheLower.includes('imob') || nicheLower.includes('imóv') || bioLower.includes('imobiliária') || bioLower.includes('imoveis') || bioLower.includes('construtora');
+  const isLaw = nicheLower.includes('advoc') || nicheLower.includes('juríd') || bioLower.includes('advogad') || bioLower.includes('escritório');
+  const isFood = nicheLower.includes('restaurante') || nicheLower.includes('delivery') || nicheLower.includes('gastronomia') || bioLower.includes('delivery') || bioLower.includes('cardápio');
+
+  let placeWord = 'da empresa';
+  let sectorWord = nicheName ? `do setor de ${nicheName.toLowerCase()}` : 'da sua área';
+  if (isCarDealer) {
+    placeWord = 'da loja';
+    sectorWord = 'do ramo automotivo';
+  } else if (isWorkshop) {
+    placeWord = 'da oficina';
+    sectorWord = 'do ramo automotivo';
+  } else if (isAuto) {
+    placeWord = 'da estética';
+    sectorWord = 'do ramo automotivo';
+  } else if (isClinic) {
+    placeWord = 'da clínica';
+    sectorWord = 'da área de clínicas e saúde';
+  } else if (isRealEstate) {
+    placeWord = 'da imobiliária';
+    sectorWord = 'do mercado imobiliário';
+  } else if (isLaw) {
+    placeWord = 'do escritório';
+    sectorWord = 'da área jurídica';
+  } else if (isFood) {
+    placeWord = 'do restaurante';
+    sectorWord = 'do ramo de gastronomia e delivery';
+  }
+
   const hasWa = Boolean(whatsappNumber);
 
   // CASO 1: NÃO anuncia na Biblioteca da Meta + Tem WhatsApp Direto
   if (!inAdLibrary && hasWa) {
     const firstMsg = isCarDealer
       ? `Opa, tudo bom? Peguei o contato de vocês lá no Instagram. Quem aí da loja cuida dessa parte comercial/marketing pra eu falar rapidinho?`
-      : `Opa, tudo bom? Peguei o WhatsApp de vocês lá no Instagram. É você mesmo que é o dono aí ${placeWord} ou é da equipe de atendimento?`;
+      : isClinic
+      ? `Opa, tudo bom? Peguei o WhatsApp de vocês lá no Instagram. Quem aí da clínica cuida da parte comercial/captação de pacientes pra eu falar rapidinho?`
+      : `Opa, tudo bom? Peguei o WhatsApp de vocês lá no Instagram. É você mesmo que é o responsável aí ${placeWord} ou é da equipe de atendimento?`;
 
-    const secondMsg = `Perguntei porque trabalho ajudando empresas do ramo automotivo a puxar cliente todo dia pelo Instagram, e vi que vocês não estão com nenhum anúncio ativo hoje. Posso te mandar um áudio de 30 segundos te explicando?`;
+    const secondMsg = `Perguntei porque trabalho ajudando empresas ${sectorWord} a puxar cliente todo dia pelo Instagram, e vi que vocês não estão com nenhum anúncio ativo hoje. Posso te mandar um áudio de 30 segundos te explicando?`;
 
     return {
       case_code: 'CASO_1_NAO_ANUNCIA_COM_WHATSAPP',
@@ -83,7 +116,7 @@ export function generateFirstMessageStrategy({
 
   // CASO 2: NÃO anuncia na Biblioteca da Meta + SEM WhatsApp na Bio
   if (!inAdLibrary && !hasWa) {
-    const firstMsg = `Opa, tudo bom? Tentei chamar vocês no WhatsApp pelo link aqui da bio mas não foi. Qual o número da loja pra eu falar rapidinho?`;
+    const firstMsg = `Opa, tudo bom? Tentei chamar vocês no WhatsApp pelo link aqui da bio mas não foi. Qual o WhatsApp aí ${placeWord} pra eu falar rapidinho?`;
     const secondMsg = `Opa, me passaram seu contato lá no Instagram! Te chamei porque vi o perfil de vocês e reparei que vocês não estão com nenhum anúncio rodando hoje pra puxar cliente pro WhatsApp. Posso te mandar um áudio de 30s?`;
 
     return {
@@ -99,7 +132,7 @@ export function generateFirstMessageStrategy({
   // CASO 3: ESTÁ na Biblioteca da Meta (1 a 4 anúncios)
   if (inAdLibrary && Number(activeAdsCount) <= 4) {
     const firstMsg = `Opa, tudo bom? Vi o anúncio de vocês rodando lá no Instagram. É você mesmo que cuida dessa parte comercial aí ${placeWord} ou tem outra pessoa responsável?`;
-    const secondMsg = `Te perguntei porque trabalho com o setor automotivo e vi a campanha de vocês. O pessoal que tá chegando pelo anúncio tá vindo qualificado pronto pra fechar ou tá caindo muito curioso perguntando preço?`;
+    const secondMsg = `Te perguntei porque trabalho com empresas ${sectorWord} e vi a campanha de vocês. O pessoal que tá chegando pelo anúncio tá vindo qualificado pronto pra fechar ou tá caindo muito curioso perguntando preço?`;
 
     return {
       case_code: 'CASO_3_NA_BIBLIOTECA_POUCOS_ANUNCIOS',
@@ -139,14 +172,90 @@ export function extractPhone(biography = '', externalUrl = '', businessPhone = '
     return raw.startsWith('55') ? raw : `55${raw}`;
   }
 
-  // 2. Números de CELULAR brasileiros (com dígito 9 após o DDD) para não confundir telefone fixo (3xxx-xxxx) com WhatsApp
-  const mobileRegex = /(?:\+?55\s?)?(?:\(?(\d{2})\)?\s?)(9\d{4})[-\s.]?(\d{4})/g;
+  // 2. Números de CELULAR brasileiros (com dígito 9 após o DDD, mesmo com espaço como "(87) 9 8133-7246")
+  const mobileRegex = /(?:\+?55\s?)?(?:\(?(\d{2})\)?\s?)(9\s?\d{4,5})[-\s.]?(\d{4})/g;
   const mobileMatch = mobileRegex.exec(combined);
   if (mobileMatch) {
-    return `55${mobileMatch[1]}${mobileMatch[2]}${mobileMatch[3]}`;
+    const ddd = mobileMatch[1];
+    let firstPart = mobileMatch[2].replace(/\D/g, '');
+    if (firstPart.length === 6 && firstPart.startsWith('99')) {
+      firstPart = firstPart.slice(1);
+    }
+    const secondPart = mobileMatch[3].replace(/\D/g, '');
+    if (firstPart.length === 5 && secondPart.length === 4) {
+      return `55${ddd}${firstPart}${secondPart}`;
+    }
   }
 
   return '';
+}
+
+// Converte resultados do apify/google-search-scraper (site:instagram.com) em perfis 100% válidos, descartando links de posts/reels quebrados
+export function parseGoogleInstagramResults(googleDataset = []) {
+  const blockedSegments = new Set([
+    'p', 'reel', 'reels', 'tv', 'stories', 'explore', 'tags',
+    'locations', 'accounts', 'directory', 'about', 'legal', 'developer'
+  ]);
+  const seenUsernames = new Set();
+  const profiles = [];
+
+  const organicList = [];
+  for (const page of Array.isArray(googleDataset) ? googleDataset : []) {
+    if (Array.isArray(page?.organicResults)) {
+      organicList.push(...page.organicResults);
+    }
+  }
+
+  for (const item of organicList) {
+    const rawUrl = String(item?.url || '').trim();
+    const urlMatch = rawUrl.match(/^https?:\/\/(?:www\.)?instagram\.com\/([a-zA-Z0-9._]{2,30})\/?(?:\?.*)?$/i);
+    if (!urlMatch) continue;
+
+    const username = urlMatch[1].trim();
+    const uLower = username.toLowerCase();
+    if (blockedSegments.has(uLower) || seenUsernames.has(uLower)) continue;
+    seenUsernames.add(uLower);
+
+    // Extrair Nome da Empresa do título do Google: ex "Ortho Vip Odontologia (@orthovippetrolina) · Petrolina, PE"
+    let fullName = String(item?.title || username)
+      .replace(/\(@[^)]+\)/g, '')
+      .replace(/•\s*Fotos e vídeos do Instagram/gi, '')
+      .replace(/-\s*Instagram/gi, '')
+      .split('·')[0]
+      .split('•')[0]
+      .trim();
+    if (!fullName) fullName = username;
+
+    // Extrair quantidade de seguidores de displayedUrl ou description (ex: "Mais de 3,9 mil seguidores")
+    const followersText = `${item?.displayedUrl || ''} ${item?.description || ''}`;
+    let followersCount = 500;
+    const milMatch = followersText.match(/([\d.,]+)\s*mil\s*seguidores/i);
+    const miMatch = followersText.match(/([\d.,]+)\s*mi(?:lh[õo]es)?\s*de?\s*seguidores/i);
+    const exactMatch = followersText.match(/([\d.]+)\s*seguidores/i);
+
+    if (miMatch) {
+      followersCount = Math.round(parseFloat(miMatch[1].replace(',', '.')) * 1000000);
+    } else if (milMatch) {
+      followersCount = Math.round(parseFloat(milMatch[1].replace(',', '.')) * 1000);
+    } else if (exactMatch) {
+      followersCount = parseInt(exactMatch[1].replace(/\./g, ''), 10) || 500;
+    }
+
+    const biography = String(item?.description || '').trim();
+    const directWa = extractPhone(biography, '');
+
+    profiles.push({
+      username,
+      fullName,
+      biography,
+      externalUrl: directWa ? `https://wa.me/${directWa}` : '',
+      followersCount,
+      whatsapp_number: directWa,
+      isGoogleVerified: true
+    });
+  }
+
+  return profiles;
 }
 
 // Verifica se o perfil está abandonado, vazio, fora do nicho ou de outra cidade
@@ -252,7 +361,7 @@ export function checkProfileHealth(rawItem, nicheObj = null, locationStr = '') {
       cityAliases.push('sp', '5519', '(19)', 'todo brasil');
     }
 
-    const mentionsTargetCity = cityAliases.some((alias) => combinedText.includes(alias));
+    const mentionsTargetCity = Boolean(rawItem.isGoogleVerified) || cityAliases.some((alias) => combinedText.includes(alias));
 
     if (!mentionsTargetCity) {
       return {

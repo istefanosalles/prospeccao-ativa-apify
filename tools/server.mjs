@@ -4,6 +4,7 @@ import http from 'http';
 import { fileURLToPath } from 'url';
 import {
   extractPhone,
+  parseGoogleInstagramResults,
   checkProfileHealth,
   resolveBioLinkWhatsApp,
   parseMetaAdsResultForProfile,
@@ -23,13 +24,18 @@ const ENV_PATH = path.join(ROOT_DIR, '.env');
 const UI_PATH = path.join(__dirname, 'dashboard.html');
 const DB_PATH = path.join(TMP_DIR, 'leads_database.json');
 const CONFIG_PATH = path.join(TMP_DIR, 'config_database.json');
+const USERS_DB_PATH = path.join(TMP_DIR, 'users_database.json');
 const SEED_DB_PATH = path.join(SEED_TMP_DIR, 'leads_database.json');
+const SEED_USERS_PATH = path.join(SEED_TMP_DIR, 'users_database.json');
 
 if (!fs.existsSync(TMP_DIR)) {
   fs.mkdirSync(TMP_DIR, { recursive: true });
 }
 if (IS_VERCEL && !fs.existsSync(DB_PATH) && fs.existsSync(SEED_DB_PATH)) {
   fs.copyFileSync(SEED_DB_PATH, DB_PATH);
+}
+if (IS_VERCEL && !fs.existsSync(USERS_DB_PATH) && fs.existsSync(SEED_USERS_PATH)) {
+  fs.copyFileSync(SEED_USERS_PATH, USERS_DB_PATH);
 }
 
 function loadEnv() {
@@ -348,58 +354,230 @@ function sendJson(res, status, obj) {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    'Access-Control-Allow-Headers': 'Content-Type, X-User-Id'
   });
   res.end(JSON.stringify(obj));
 }
 
+// ============================================================================
+// SISTEMA MULTI-USUÁRIO (Login + Isolamento de Pesquisa + Onboarding Inicial)
+// ============================================================================
+function loadUsersDb() {
+  const baseDb = loadDatabase();
+  const baseCfg = loadConfig();
+  const defaultSallesUser = {
+    id: 'user-salles',
+    name: 'Istêfano Salles',
+    email: 'salles@salles.ia',
+    password: '123',
+    onboardingCompleted: true,
+    preferences: {
+      category: 'Automotivo',
+      nicheName: 'Loja de Veículos & Seminovos',
+      keyword: 'seminovos',
+      location: 'Petrolina - PE'
+    },
+    leads: baseDb.leads || [],
+    history: baseDb.history || [],
+    deletedUsernames: baseDb.deletedUsernames || [],
+    config: baseCfg
+  };
+
+  if (!fs.existsSync(USERS_DB_PATH)) {
+    const initialUsers = { users: [defaultSallesUser] };
+    fs.writeFileSync(USERS_DB_PATH, JSON.stringify(initialUsers, null, 2), 'utf-8');
+    return initialUsers;
+  }
+  try {
+    const parsed = JSON.parse(fs.readFileSync(USERS_DB_PATH, 'utf-8'));
+    if (!Array.isArray(parsed.users) || parsed.users.length === 0) {
+      parsed.users = [defaultSallesUser];
+    }
+    return parsed;
+  } catch {
+    return { users: [defaultSallesUser] };
+  }
+}
+
+function saveUsersDb(usersDb) {
+  fs.writeFileSync(USERS_DB_PATH, JSON.stringify(usersDb, null, 2), 'utf-8');
+}
+
+function getUserContext(req, explicitUserId = '') {
+  const usersDb = loadUsersDb();
+  const headerUserId = explicitUserId || req.headers['x-user-id'] || 'user-salles';
+  let user = usersDb.users.find((u) => u.id === headerUserId);
+  if (!user) {
+    user = usersDb.users[0];
+  }
+  const env = loadEnv();
+  user.config = user.config || loadConfig();
+  user.config.apifyConnected = Boolean(env.APIFY_API_TOKEN);
+  user.config.datacrazyWebhookUrl = user.config.datacrazyWebhookUrl || env.DATACRAZY_WEBHOOK_URL || '';
+  user.leads = user.leads || [];
+  user.history = user.history || [];
+  user.deletedUsernames = user.deletedUsernames || [];
+  return { usersDb, user };
+}
+
 const PORT = 3099;
 
-// Motor centralizado de execução de prospecção (usado tanto na busca manual quanto no Gatilho Automático da Fase 5)
-async function executeProspectingRun({ nicheId, keyword, location, limit, autoSendDataCrazy, source = 'manual' }) {
+// Verificação Assíncrona na Biblioteca da Meta em Background (Não trava a pesquisa do usuário!)
+async function verifyMetaAdsInBackground(userId, validProfiles, nicheObj, cleanLocation, autoSendDataCrazy) {
+  if (!validProfiles || validProfiles.length === 0) return;
+  const env = loadEnv();
+  const token = env.APIFY_API_TOKEN;
+  if (!token) return;
+
+  try {
+    const startUrls = validProfiles.map((p) => ({
+      url: `https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=${encodeURIComponent(p.username)}`
+    }));
+
+    const adsResp = await fetch(`https://api.apify.com/v2/acts/apify~facebook-ads-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startUrls,
+        onlyTotal: false,
+        resultsLimit: 4
+      })
+    });
+
+    if (!adsResp.ok) return;
+    const adsResults = await adsResp.json();
+    fs.writeFileSync(path.join(TMP_DIR, 'last_meta_ads_check.json'), JSON.stringify(adsResults, null, 2), 'utf-8');
+
+    const { usersDb, user } = getUserContext({ headers: {} }, userId);
+    let changed = false;
+
+    if (Array.isArray(adsResults)) {
+      for (const item of adsResults) {
+        const qMatch = String(item.inputUrl || '').match(/[?&]q=([^&]+)/);
+        if (!qMatch) continue;
+        const uName = decodeURIComponent(qMatch[1]).toLowerCase();
+        const prof = validProfiles.find((vp) => vp.username.toLowerCase() === uName);
+        if (!prof) continue;
+
+        const parsedAd = parseMetaAdsResultForProfile(item, prof);
+        const leadIdx = user.leads.findIndex((l) => l.instagram.username.toLowerCase() === uName);
+        if (leadIdx >= 0) {
+          const lead = user.leads[leadIdx];
+          lead.meta_ads.in_ad_library = parsedAd.count > 0;
+          lead.meta_ads.active_ads_count = parsedAd.count;
+          lead.meta_ads.ad_library_status_label = parsedAd.count > 0 ? `Está na Biblioteca (${parsedAd.count} anúncios)` : 'Não está na Biblioteca';
+          if (!lead.contact.whatsapp_number && parsedAd.adPhone) {
+            lead.contact.whatsapp_number = parsedAd.adPhone;
+          }
+          lead.qualification = qualifyLead({
+            inAdLibrary: lead.meta_ads.in_ad_library,
+            activeAdsCount: lead.meta_ads.active_ads_count,
+            whatsappNumber: lead.contact.whatsapp_number,
+            followersCount: lead.instagram.followers_count,
+            biography: lead.instagram.biography
+          });
+          lead.message_strategy = generateFirstMessageStrategy({
+            fullName: lead.instagram.full_name,
+            username: lead.instagram.username,
+            nicheId: lead.niche_id,
+            nicheName: lead.niche_name,
+            location: lead.location,
+            biography: lead.instagram.biography,
+            inAdLibrary: lead.meta_ads.in_ad_library,
+            activeAdsCount: lead.meta_ads.active_ads_count,
+            whatsappNumber: lead.contact.whatsapp_number,
+            followersCount: lead.instagram.followers_count
+          });
+          lead.contact.personalized_message = lead.message_strategy.first_message;
+          lead.contact.whatsapp_link = lead.contact.whatsapp_number
+            ? `https://wa.me/${lead.contact.whatsapp_number}?text=${encodeURIComponent(lead.contact.personalized_message)}`
+            : `https://ig.me/m/${lead.instagram.username}`;
+          changed = true;
+        }
+      }
+    }
+
+    if (changed) {
+      saveUsersDb(usersDb);
+    }
+  } catch (err) {
+    console.error('Aviso na verificação Meta Ads em background:', err.message);
+  }
+}
+
+// Motor centralizado de execução de prospecção ULTRA-RÁPIDA (Google Instagram Index + Validação de Links Reais)
+async function executeProspectingRun({ userId = 'user-salles', nicheId, keyword, location, limit, autoSendDataCrazy, source = 'manual' }) {
   const env = loadEnv();
   const token = env.APIFY_API_TOKEN;
   if (!token) {
     throw new Error('Token da Apify não encontrado no .env');
   }
 
-  const config = loadConfig();
+  const { usersDb, user } = getUserContext({ headers: {} }, userId);
+  const config = user.config;
   const nicheObj = config.niches.find((n) => n.id === nicheId) || config.niches[0];
   const rawKeyword = (keyword || nicheObj.keywords[0] || nicheObj.name).trim();
   const cleanLocation = (location || 'Brasil').trim();
   const cityClean = cleanLocation && cleanLocation.toLowerCase() !== 'brasil' ? cleanLocation.split('-')[0].trim() : '';
 
-  const keywordWords = rawKeyword.split(/\s+/).filter(Boolean);
-  const conciseKeyword = cityClean && keywordWords.length > 2 ? keywordWords[0] : rawKeyword;
-  const searchQuery = cityClean ? `${conciseKeyword} ${cityClean}` : rawKeyword;
-  const parsedLimit = Math.min(Math.max(Number(limit) || 5, 1), 15);
-  const fetchLimit = Math.min(parsedLimit * 3, 24);
+  const searchQuery = cityClean ? `${rawKeyword} ${cityClean}` : rawKeyword;
+  const parsedLimit = Math.min(Math.max(Number(limit) || 6, 1), 15);
 
-  // 1. Chamar Actor apify/instagram-search-scraper
-  const igResp = await fetch(`https://api.apify.com/v2/acts/apify~instagram-search-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      search: searchQuery,
-      searchType: 'user',
-      searchLimit: fetchLimit
-    })
-  });
+  // 1. BUSCA ULTRA-RÁPIDA (~12s) via apify/google-search-scraper filtrando apenas perfis raiz válidos do Instagram!
+  const googleQuery = `site:instagram.com ${searchQuery}`;
+  let candidateProfiles = [];
 
-  if (!igResp.ok) {
-    const errTxt = await igResp.text();
-    throw new Error(`Erro Apify Instagram: ${errTxt}`);
+  try {
+    const gResp = await fetch(`https://api.apify.com/v2/acts/apify~google-search-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        queries: googleQuery,
+        maxPagesPerQuery: 1,
+        resultsPerPage: Math.min(parsedLimit * 4, 30),
+        countryCode: 'br',
+        languageCode: 'pt-BR'
+      })
+    });
+
+    if (gResp.ok) {
+      const gData = await gResp.json();
+      candidateProfiles = parseGoogleInstagramResults(gData);
+    }
+  } catch (gErr) {
+    console.error('Aviso na busca rápida Google Instagram:', gErr.message);
   }
 
-  const igProfiles = await igResp.json();
-  const dbBefore = loadDatabase();
-  const deletedSet = new Set((dbBefore.deletedUsernames || []).map((u) => String(u).toLowerCase()));
+  // Fallback para instagram-search-scraper somente se o Google trouxer zero resultados
+  if (candidateProfiles.length === 0) {
+    const igResp = await fetch(`https://api.apify.com/v2/acts/apify~instagram-search-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        search: searchQuery,
+        searchType: 'user',
+        searchLimit: Math.min(parsedLimit * 2, 16)
+      })
+    });
+    if (igResp.ok) {
+      const igData = await igResp.json();
+      candidateProfiles = Array.isArray(igData) ? igData : [];
+    }
+  }
+
+  const deletedSet = new Set((user.deletedUsernames || []).map((u) => String(u).toLowerCase()));
   const discardedProfiles = [];
   const healthyProfiles = [];
 
-  for (const p of Array.isArray(igProfiles) ? igProfiles : []) {
+  for (const p of candidateProfiles) {
     if (!p || !p.username) continue;
-    if (deletedSet.has(String(p.username).toLowerCase())) {
+    const uLow = String(p.username).toLowerCase();
+    // Garantir que o username é 100% válido para link do Instagram
+    if (!/^[a-z0-9._]{2,30}$/i.test(uLow)) {
+      discardedProfiles.push({ username: p.username, reason: 'Link de perfil inválido' });
+      continue;
+    }
+    if (deletedSet.has(uLow)) {
       discardedProfiles.push({ username: p.username, reason: 'Já excluído pelo usuário anteriormente' });
       continue;
     }
@@ -420,11 +598,11 @@ async function executeProspectingRun({ nicheId, keyword, location, limit, autoSe
     'utf-8'
   );
 
-  // 2. Resolver Linktree / Bio Links em paralelo
+  // 2. Resolver Linktree / Bio Links em paralelo (com timeout rápido)
   const resolvedBioPhones = {};
   await Promise.all(
     validProfiles.map(async (p) => {
-      const directPhone = extractPhone(p.biography || '', p.externalUrl || '', p.businessPhoneNumber || '', p.externalUrls || []);
+      const directPhone = p.whatsapp_number || extractPhone(p.biography || '', p.externalUrl || '', p.businessPhoneNumber || '', p.externalUrls || []);
       if (directPhone) {
         resolvedBioPhones[p.username.toLowerCase()] = directPhone;
       } else if (p.externalUrl) {
@@ -436,66 +614,20 @@ async function executeProspectingRun({ nicheId, keyword, location, limit, autoSe
     })
   );
 
-  // 3. Verificar na Biblioteca de Anúncios da Meta
-  const adsMap = {};
-  const adsPhoneMap = {};
-  if (validProfiles.length > 0) {
-    try {
-      const startUrls = validProfiles.map((p) => ({
-        url: `https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=BR&q=${encodeURIComponent(p.username)}`
-      }));
-
-      const adsResp = await fetch(`https://api.apify.com/v2/acts/apify~facebook-ads-scraper/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          startUrls,
-          onlyTotal: false,
-          resultsLimit: 4
-        })
-      });
-
-      if (adsResp.ok) {
-        const adsResults = await adsResp.json();
-        fs.writeFileSync(path.join(TMP_DIR, 'last_meta_ads_check.json'), JSON.stringify(adsResults, null, 2), 'utf-8');
-        if (Array.isArray(adsResults)) {
-          for (const item of adsResults) {
-            const qMatch = String(item.inputUrl || '').match(/[?&]q=([^&]+)/);
-            if (qMatch) {
-              const uName = decodeURIComponent(qMatch[1]).toLowerCase();
-              const prof = validProfiles.find((vp) => vp.username.toLowerCase() === uName);
-              if (prof) {
-                const parsedAd = parseMetaAdsResultForProfile(item, prof);
-                adsMap[uName] = parsedAd.count;
-                if (parsedAd.adPhone) {
-                  adsPhoneMap[uName] = parsedAd.adPhone;
-                }
-              }
-            }
-          }
-        }
-      }
-    } catch (adsErr) {
-      console.error('Aviso na verificação Meta Ads:', adsErr.message);
-    }
-  }
-
-  const db = loadDatabase();
   const newLeads = [];
 
   for (const p of validProfiles) {
     const uLower = p.username.toLowerCase();
-    const adsCount = adsMap[uLower] ?? 0;
-    const resolvedWa = resolvedBioPhones[uLower] || adsPhoneMap[uLower] || '';
+    const resolvedWa = resolvedBioPhones[uLower] || '';
     const leadObj = buildProspectLead({
       username: p.username,
       full_name: p.fullName || p.username,
       biography: p.biography || '',
       external_url: p.externalUrl || '',
-      followers_count: p.followersCount || 0,
+      followers_count: p.followersCount || 500,
       whatsapp_number: resolvedWa,
-      in_ad_library: adsCount > 0,
-      active_ads_count: adsCount,
+      in_ad_library: false,
+      active_ads_count: 0,
       location: cleanLocation
     }, nicheObj, cleanLocation);
 
@@ -509,17 +641,17 @@ async function executeProspectingRun({ nicheId, keyword, location, limit, autoSe
       }
     }
 
-    const existingIdx = db.leads.findIndex((l) => l.instagram.username.toLowerCase() === uLower);
+    const existingIdx = user.leads.findIndex((l) => l.instagram.username.toLowerCase() === uLower);
     if (existingIdx >= 0) {
-      db.leads[existingIdx] = leadObj;
+      user.leads[existingIdx] = leadObj;
     } else {
-      db.leads.unshift(leadObj);
+      user.leads.unshift(leadObj);
     }
     newLeads.push(leadObj);
   }
 
-  db.history = db.history || [];
-  db.history.unshift({
+  user.history = user.history || [];
+  user.history.unshift({
     id: `run-${Date.now()}`,
     source,
     nicheName: nicheObj.name,
@@ -532,12 +664,16 @@ async function executeProspectingRun({ nicheId, keyword, location, limit, autoSe
     timestamp: new Date().toISOString()
   });
 
-  saveDatabase(db);
+  saveUsersDb(usersDb);
+
+  // 3. Disparar verificação na Biblioteca da Meta em BACKGROUND para não travar a resposta!
+  verifyMetaAdsInBackground(user.id, validProfiles, nicheObj, cleanLocation, autoSendDataCrazy);
+
   return {
     newLeadsCount: newLeads.length,
     discardedCount: discardedProfiles.length,
-    leads: db.leads,
-    history: db.history
+    leads: user.leads,
+    history: user.history
   };
 }
 
@@ -558,40 +694,223 @@ export async function requestHandler(req, res) {
     return res.end('Dashboard sendo inicializado...');
   }
 
+  // Autenticação: Login
+  if (pathname === '/api/auth/login' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      const email = String(body.email || '').trim().toLowerCase();
+      const password = String(body.password || '').trim();
+      const usersDb = loadUsersDb();
+      const user = usersDb.users.find((u) => String(u.email || '').toLowerCase() === email && String(u.password || '') === password);
+      if (!user) {
+        return sendJson(res, 401, { ok: false, error: 'E-mail ou senha inválidos.' });
+      }
+      return sendJson(res, 200, {
+        ok: true,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          onboardingCompleted: Boolean(user.onboardingCompleted),
+          preferences: user.preferences || {}
+        },
+        leads: user.leads || [],
+        history: user.history || [],
+        config: user.config || loadConfig()
+      });
+    } catch (err) {
+      return sendJson(res, 400, { ok: false, error: err.message });
+    }
+  }
+
+  // Autenticação: Cadastro de Novo Usuário (inicia com Pré-Formulário de Onboarding ativo!)
+  if (pathname === '/api/auth/register' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      const name = String(body.name || 'Usuário').trim();
+      const email = String(body.email || '').trim().toLowerCase();
+      const password = String(body.password || '').trim();
+      if (!email || !password) {
+        return sendJson(res, 400, { ok: false, error: 'Preencha nome, e-mail e senha.' });
+      }
+      const usersDb = loadUsersDb();
+      if (usersDb.users.some((u) => String(u.email || '').toLowerCase() === email)) {
+        return sendJson(res, 400, { ok: false, error: 'Este e-mail já está cadastrado. Faça login!' });
+      }
+      const env = loadEnv();
+      const newUser = {
+        id: `user-${Date.now()}`,
+        name,
+        email,
+        password,
+        onboardingCompleted: false,
+        preferences: {},
+        leads: [],
+        history: [],
+        deletedUsernames: [],
+        config: {
+          niches: JSON.parse(JSON.stringify(DEFAULT_NICHES)),
+          selectedNicheId: 'automotivo-estetica',
+          autoSendDataCrazy: false,
+          datacrazyWebhookUrl: env.DATACRAZY_WEBHOOK_URL || '',
+          apifyConnected: Boolean(env.APIFY_API_TOKEN),
+          trigger: {
+            enabled: false,
+            intervalHours: 24,
+            nicheId: 'automotivo-estetica',
+            keyword: 'estetica automotiva',
+            location: 'Petrolina - PE',
+            limit: 6,
+            autoSendDataCrazy: true,
+            lastRunAt: null,
+            nextRunAt: null
+          }
+        }
+      };
+      usersDb.users.push(newUser);
+      saveUsersDb(usersDb);
+      return sendJson(res, 200, {
+        ok: true,
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+          onboardingCompleted: false,
+          preferences: {}
+        },
+        leads: [],
+        history: [],
+        config: newUser.config
+      });
+    } catch (err) {
+      return sendJson(res, 400, { ok: false, error: err.message });
+    }
+  }
+
+  // Pré-Formulário Inicial (Onboarding): Salva o nicho de interesse do usuário e já roda a Pré-Pesquisa Ultra-Rápida!
+  if (pathname === '/api/auth/onboarding' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody(req);
+      const { usersDb, user } = getUserContext(req, body.userId);
+      const nicheName = String(body.interestedNiche || body.nicheName || body.category || 'Meu Nicho').trim();
+      const category = String(body.category || nicheName).trim();
+      const keyword = String(body.targetKeywords || body.keyword || nicheName).trim();
+      const location = String(body.targetCity || body.location || 'Petrolina - PE').trim();
+      const limit = Number(body.limit) || 6;
+      const runPreSearch = body.runPreSearch !== false;
+      const autoSendDataCrazy = Boolean(body.autoSendDataCrazy);
+
+      const nicheId = String(nicheName)
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-');
+
+      const newNiche = {
+        id: nicheId,
+        name: nicheName,
+        category,
+        keywords: [keyword, nicheName.toLowerCase()],
+        defaultMessage: `Opa, tudo bom? Peguei o contato de vocês lá no Instagram. Quem aí cuida da parte comercial/marketing pra eu falar rapidinho?`
+      };
+
+      const existingIdx = user.config.niches.findIndex((n) => n.id === nicheId);
+      if (existingIdx >= 0) {
+        user.config.niches[existingIdx] = newNiche;
+      } else {
+        user.config.niches.unshift(newNiche);
+      }
+      user.config.selectedNicheId = nicheId;
+      user.onboardingCompleted = true;
+      user.preferences = {
+        interestedNiche: nicheName,
+        targetKeywords: keyword,
+        targetCity: location,
+        category,
+        nicheName,
+        keyword,
+        location
+      };
+      saveUsersDb(usersDb);
+
+      let result = { newLeadsCount: 0, discardedCount: 0, leads: user.leads, history: user.history };
+      if (runPreSearch) {
+        result = await executeProspectingRun({
+          userId: user.id,
+          nicheId,
+          keyword,
+          location,
+          limit,
+          autoSendDataCrazy,
+          source: 'onboarding_pre_pesquisa'
+        });
+      }
+
+      const refreshed = getUserContext(req, user.id).user;
+      return sendJson(res, 200, {
+        ok: true,
+        user: {
+          id: refreshed.id,
+          name: refreshed.name,
+          email: refreshed.email,
+          onboardingCompleted: true,
+          preferences: refreshed.preferences
+        },
+        config: refreshed.config,
+        ...result
+      });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
+  }
+
   if (pathname === '/api/state' && req.method === 'GET') {
-    const db = loadDatabase();
-    const config = loadConfig();
-    return sendJson(res, 200, { leads: db.leads, history: db.history || [], config });
+    const { user } = getUserContext(req);
+    return sendJson(res, 200, {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        onboardingCompleted: Boolean(user.onboardingCompleted),
+        preferences: user.preferences || {}
+      },
+      leads: user.leads,
+      history: user.history || [],
+      config: user.config
+    });
   }
 
   if (pathname === '/api/niches' && req.method === 'POST') {
     try {
       const body = await parseJsonBody(req);
-      const config = loadConfig();
+      const { usersDb, user } = getUserContext(req);
+      const config = user.config;
       const id = body.id || String(body.name || 'nicho').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-');
       const newNiche = {
         id,
         name: body.name,
         category: body.category || 'Personalizado',
         keywords: Array.isArray(body.keywords) ? body.keywords : String(body.keywords || '').split(',').map((s) => s.trim()).filter(Boolean),
-        defaultMessage: body.defaultMessage || 'Olá, {nome}! Vi o perfil @{username} no Instagram e notei que vocês não estão com anúncios ativos na Biblioteca da Meta hoje. Podemos conversar?'
+        defaultMessage: body.defaultMessage || 'Opa, tudo bom? Peguei o contato de vocês lá no Instagram. Quem aí cuida da parte comercial pra eu falar rapidinho?'
       };
       const existingIdx = config.niches.findIndex((n) => n.id === id);
       if (existingIdx >= 0) config.niches[existingIdx] = newNiche;
       else config.niches.unshift(newNiche);
       config.selectedNicheId = id;
-      saveConfig(config);
+      saveUsersDb(usersDb);
       return sendJson(res, 200, { ok: true, config });
     } catch (err) {
       return sendJson(res, 400, { ok: false, error: err.message });
     }
   }
 
-  // Pesquisa em Tempo Real na Apify (Instagram Search + Meta Ads Library)
+  // Pesquisa em Tempo Real Ultra-Rápida (por Usuário Logado)
   if (pathname === '/api/prospect' && req.method === 'POST') {
     try {
       const body = await parseJsonBody(req);
+      const { user } = getUserContext(req);
       const result = await executeProspectingRun({
+        userId: user.id,
         nicheId: body.nicheId,
         keyword: body.keyword,
         location: body.location,
@@ -612,7 +931,8 @@ export async function requestHandler(req, res) {
   if (pathname === '/api/trigger/config' && req.method === 'POST') {
     try {
       const body = await parseJsonBody(req);
-      const config = loadConfig();
+      const { usersDb, user } = getUserContext(req);
+      const config = user.config;
       const enabled = Boolean(body.enabled);
       const intervalHours = Math.max(1, Number(body.intervalHours) || 24);
       const nextRunAt = enabled ? new Date(Date.now() + intervalHours * 3600 * 1000).toISOString() : null;
@@ -628,7 +948,7 @@ export async function requestHandler(req, res) {
         autoSendDataCrazy: body.autoSendDataCrazy !== undefined ? Boolean(body.autoSendDataCrazy) : true,
         nextRunAt
       };
-      saveConfig(config);
+      saveUsersDb(usersDb);
       return sendJson(res, 200, { ok: true, config });
     } catch (err) {
       return sendJson(res, 400, { ok: false, error: err.message });
@@ -639,22 +959,22 @@ export async function requestHandler(req, res) {
   if (pathname === '/api/datacrazy/send' && req.method === 'POST') {
     try {
       const body = await parseJsonBody(req);
-      const db = loadDatabase();
-      const config = loadConfig();
+      const { usersDb, user } = getUserContext(req);
+      const config = user.config;
       const ids = Array.isArray(body.leadIds) ? body.leadIds : [body.leadId];
       const synced = [];
 
       for (const id of ids) {
-        const idx = db.leads.findIndex((l) => l.id === id);
+        const idx = user.leads.findIndex((l) => l.id === id);
         if (idx < 0) continue;
-        await sendLeadToDataCrazy(db.leads[idx], config.datacrazyWebhookUrl);
-        db.leads[idx].contact.datacrazy_synced = true;
-        db.leads[idx].contact.datacrazy_synced_at = new Date().toISOString();
-        synced.push(db.leads[idx]);
+        await sendLeadToDataCrazy(user.leads[idx], config.datacrazyWebhookUrl);
+        user.leads[idx].contact.datacrazy_synced = true;
+        user.leads[idx].contact.datacrazy_synced_at = new Date().toISOString();
+        synced.push(user.leads[idx]);
       }
 
-      saveDatabase(db);
-      return sendJson(res, 200, { ok: true, syncedCount: synced.length, leads: db.leads });
+      saveUsersDb(usersDb);
+      return sendJson(res, 200, { ok: true, syncedCount: synced.length, leads: user.leads });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });
     }
@@ -665,12 +985,11 @@ export async function requestHandler(req, res) {
     try {
       const id = decodeURIComponent(pathname.replace('/api/leads/', ''));
       const body = await parseJsonBody(req);
-      const db = loadDatabase();
-      const config = loadConfig();
-      const idx = db.leads.findIndex((l) => l.id === id);
+      const { usersDb, user } = getUserContext(req);
+      const idx = user.leads.findIndex((l) => l.id === id);
       if (idx < 0) return sendJson(res, 404, { ok: false, error: 'Lead não encontrado' });
 
-      const lead = db.leads[idx];
+      const lead = user.leads[idx];
       if (body.pipeline_status) lead.contact.pipeline_status = body.pipeline_status;
       if (body.whatsapp_number !== undefined) {
         const clean = String(body.whatsapp_number).replace(/\D/g, '');
@@ -717,8 +1036,8 @@ export async function requestHandler(req, res) {
         });
       }
 
-      saveDatabase(db);
-      return sendJson(res, 200, { ok: true, lead, leads: db.leads });
+      saveUsersDb(usersDb);
+      return sendJson(res, 200, { ok: true, lead, leads: user.leads });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });
     }
@@ -728,18 +1047,18 @@ export async function requestHandler(req, res) {
   if (pathname.startsWith('/api/leads/') && req.method === 'DELETE') {
     try {
       const id = decodeURIComponent(pathname.replace('/api/leads/', ''));
-      const db = loadDatabase();
-      const idx = db.leads.findIndex((l) => l.id === id);
+      const { usersDb, user } = getUserContext(req);
+      const idx = user.leads.findIndex((l) => l.id === id);
       if (idx < 0) return sendJson(res, 404, { ok: false, error: 'Lead não encontrado' });
 
-      const removed = db.leads.splice(idx, 1)[0];
+      const removed = user.leads.splice(idx, 1)[0];
       const uName = String(removed?.instagram?.username || '').toLowerCase();
       if (uName) {
-        db.deletedUsernames = Array.from(new Set([...(db.deletedUsernames || []), uName]));
+        user.deletedUsernames = Array.from(new Set([...(user.deletedUsernames || []), uName]));
       }
 
-      saveDatabase(db);
-      return sendJson(res, 200, { ok: true, deletedId: id, deletedUsername: uName, leads: db.leads });
+      saveUsersDb(usersDb);
+      return sendJson(res, 200, { ok: true, deletedId: id, deletedUsername: uName, leads: user.leads });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });
     }

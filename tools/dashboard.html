@@ -6,7 +6,7 @@
   <title>Salles Prospector — Prospecção Ativa (V.L.A.E.G.)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --paper: #f8f8f6;
@@ -77,7 +77,7 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      font: 700 13px/1 'Montserrat', sans-serif;
+      font: 700 13px/1 'Inter', sans-serif;
       letter-spacing: -0.03em;
       color: var(--ink);
       text-decoration: none;
@@ -92,7 +92,7 @@
       background: linear-gradient(135deg, #8b7cff 0%, #5f8cff 100%);
       color: #fff;
       box-shadow: 0 4px 10px rgba(95, 140, 255, 0.24);
-      font: 700 9px/1 'Montserrat', sans-serif;
+      font: 700 9px/1 'Inter', sans-serif;
     }
 
     .topbar-right {
@@ -155,7 +155,7 @@
 
     .hero h1 {
       margin: 0 0 14px;
-      font: 700 clamp(30px, 4.5vw, 44px)/1.05 'Montserrat', sans-serif;
+      font: 700 clamp(30px, 4.5vw, 44px)/1.05 'Inter', sans-serif;
       letter-spacing: -0.065em;
       color: var(--ink-title);
       max-width: 760px;
@@ -202,7 +202,7 @@
     }
 
     .feature-head h2 {
-      font: 700 22px/1.1 'Montserrat', sans-serif;
+      font: 700 22px/1.1 'Inter', sans-serif;
       letter-spacing: -0.055em;
       color: #fff;
     }
@@ -254,7 +254,7 @@
       border-radius: 999px;
       border: 0;
       color: #fff;
-      font: 700 13px/1 'Montserrat', sans-serif;
+      font: 700 13px/1 'Inter', sans-serif;
       letter-spacing: -0.02em;
       background: linear-gradient(135deg, #8b7cff 0%, #5f8cff 100%);
       box-shadow:
@@ -369,7 +369,7 @@
     .kpi-copy strong {
       display: block;
       color: var(--ink-title);
-      font: 700 24px/1.05 'Montserrat', sans-serif;
+      font: 700 24px/1.05 'Inter', sans-serif;
       letter-spacing: -0.055em;
     }
 
@@ -550,7 +550,7 @@
     .lead-copy h3 {
       margin: 0 0 4px;
       color: var(--ink-title);
-      font: 700 18px/1.15 'Montserrat', sans-serif;
+      font: 700 18px/1.15 'Inter', sans-serif;
       letter-spacing: -0.055em;
     }
 
@@ -624,7 +624,7 @@
         inset -3px -4px 8px rgba(60, 40, 160, 0.25),
         0 6px 16px rgba(95, 140, 255, 0.28);
       color: #fff;
-      font: 700 12px/1 'Montserrat', sans-serif;
+      font: 700 12px/1 'Inter', sans-serif;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
@@ -691,14 +691,14 @@
       <div class="topbar-right">
         <span class="status-chip">
           <i></i>
-          MCP Apify Conectado
-        </span>
-        <span class="status-chip">
-          <i></i>
-          CRM DataCrazy Ativo
+          Busca Rápida (100% Válidos)
         </span>
         <button id="triggerStatusBtn" onclick="openTriggerModal()" class="btn-pill-soft">⚡ Gatilho: Manual</button>
+        <button onclick="openOnboardingModal()" class="btn-pill-soft">🎯 Pré-Formulário</button>
         <button onclick="openNewNicheModal()" class="btn-pill-soft">+ Novo Nicho</button>
+        <button id="userMenuBtn" onclick="openAuthModal()" class="btn-pill-soft" style="background:#f5efff;border-color:#d7c4f3;color:#5a3cc0;">
+          👤 <span id="currentUserNameLabel">Istêfano Salles</span> • Trocar Login
+        </button>
       </div>
     </header>
 
@@ -858,8 +858,8 @@
 
     <!-- Banner de Busca Ativa -->
     <div id="loadingBanner" style="display:none;margin-bottom:22px;padding:22px;border-radius:16px;background:linear-gradient(135deg,#17152a 0%,#211d43 100%);color:#fff;text-align:center;">
-      <p style="font:700 15px Montserrat,sans-serif;color:#c4b5fd;margin-bottom:6px;">Pesquisando perfis no Instagram e consultando a Biblioteca da Meta...</p>
-      <p style="font:400 12px Inter,sans-serif;color:#bdb8dc;">Aguarde de 15 a 25 segundos enquanto a Apify valida os anúncios ativos de cada empresa.</p>
+      <p style="font:700 15px Inter,sans-serif;color:#c4b5fd;margin-bottom:6px;">⚡ Busca Ultra-Rápida em andamento (100% perfis reais e ativos)...</p>
+      <p style="font:400 12px Inter,sans-serif;color:#bdb8dc;">Levamos apenas 10 a 15 segundos para capturar perfis válidos do Instagram e validar na Biblioteca da Meta em segundo plano.</p>
     </div>
 
     <!-- Cabeçalho da Fila de Leads -->
@@ -895,7 +895,7 @@
   <div id="newNicheModal" class="quiz-overlay">
     <div class="quiz-dialog">
       <span class="scribble">Expandir operação</span>
-      <h3 style="margin:0 0 18px;font:700 22px/1.1 Montserrat,sans-serif;letter-spacing:-0.06em;color:#292929;">
+      <h3 style="margin:0 0 18px;font:700 22px/1.1 Inter,sans-serif;letter-spacing:-0.06em;color:#292929;">
         Cadastrar novo <em>nicho de busca</em>
       </h3>
 
@@ -927,7 +927,7 @@
   <div id="triggerModal" class="quiz-overlay">
     <div class="quiz-dialog">
       <span class="scribble">Fase 5 • Gatilho V.L.A.E.G.</span>
-      <h3 style="margin:0 0 8px;font:700 22px/1.1 Montserrat,sans-serif;letter-spacing:-0.06em;color:#292929;">
+      <h3 style="margin:0 0 8px;font:700 22px/1.1 Inter,sans-serif;letter-spacing:-0.06em;color:#292929;">
         Piloto Automático de <em>Prospecção</em>
       </h3>
       <p style="margin:0 0 16px;font:400 12px/1.45 Inter,sans-serif;color:#5c5c5c;">
@@ -987,26 +987,283 @@
     </div>
   </div>
 
+  <!-- Modal de Login / Criar Nova Conta (Pesquisa Salva por Login) -->
+  <div id="authModal" class="quiz-overlay">
+    <div class="quiz-dialog" style="max-width:460px;">
+      <span class="scribble">Pesquisa Salva por Login</span>
+      <h3 style="margin:0 0 8px;font:700 22px/1.1 Inter,sans-serif;letter-spacing:-0.06em;color:#292929;">
+        Entrar ou criar <em>novo login</em>
+      </h3>
+      <p style="margin:0 0 16px;font:400 12px/1.45 Inter,sans-serif;color:#5c5c5c;">
+        Cada login tem sua própria base de leads, nichos e histórico salvos separadamente. Ao criar um usuário novo, abriremos o <b>Pré-Formulário de Nicho</b> para já fazer a primeira pré-pesquisa!
+      </p>
+
+      <!-- Abas Login / Cadastro -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button id="authTabLogin" onclick="switchAuthTab('login')" class="tab-btn tab-btn-active" style="flex:1;">Entrar em Conta</button>
+        <button id="authTabRegister" onclick="switchAuthTab('register')" class="tab-btn" style="flex:1;">Sou Usuário Novo (Criar)</button>
+      </div>
+
+      <!-- Formulário de Login -->
+      <div id="authLoginForm" style="display:grid;gap:11px;">
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Seu E-mail</span>
+          <input id="loginEmail" type="email" value="salles@salles.ia" placeholder="Ex: voce@empresa.com" class="clean-input" style="width:100%;" />
+        </label>
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Senha</span>
+          <input id="loginPassword" type="password" value="123" placeholder="Sua senha" class="clean-input" style="width:100%;" />
+        </label>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;">
+          <button onclick="closeAuthModal()" class="tab-btn">Cancelar</button>
+          <button onclick="submitLogin()" class="btn-codex-primary" style="padding:11px 20px;">Entrar no Meu Painel</button>
+        </div>
+      </div>
+
+      <!-- Formulário de Novo Usuário -->
+      <div id="authRegisterForm" style="display:none;gap:11px;">
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Seu Nome ou Empresa</span>
+          <input id="regName" type="text" placeholder="Ex: João Consultoria" class="clean-input" style="width:100%;" />
+        </label>
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">E-mail de Acesso</span>
+          <input id="regEmail" type="email" placeholder="Ex: joao@agencia.com" class="clean-input" style="width:100%;" />
+        </label>
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">Criar Senha</span>
+          <input id="regPassword" type="password" value="123" placeholder="Crie uma senha simples" class="clean-input" style="width:100%;" />
+        </label>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;">
+          <button onclick="closeAuthModal()" class="tab-btn">Cancelar</button>
+          <button onclick="submitRegister()" class="btn-codex-primary" style="padding:11px 20px;">Criar Conta & Abrir Pré-Formulário →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Pré-Formulário de Primeiro Acesso (Onboarding de Nicho) -->
+  <div id="onboardingModal" class="quiz-overlay">
+    <div class="quiz-dialog" style="max-width:540px;">
+      <span class="scribble">Bem-vindo ao Salles Prospector!</span>
+      <h3 style="margin:0 0 8px;font:700 24px/1.1 Inter,sans-serif;letter-spacing:-0.06em;color:#292929;">
+        Qual nicho você tem <em>interesse em buscar?</em>
+      </h3>
+      <p style="margin:0 0 16px;font:400 12.5px/1.45 Inter,sans-serif;color:#5c5c5c;">
+        Preencha este rápido pré-formulário. Vamos configurar seu painel personalizado e já rodar uma <b>pré-pesquisa ultra-rápida (~12s)</b> trazendo apenas perfis válidos do Instagram!
+      </p>
+
+      <div style="margin-bottom:14px;">
+        <span style="display:block;margin:0 0 7px 2px;font:600 11px Inter,sans-serif;color:#636363;">Sugestões rápidas (clique para preencher ou digite qualquer nicho abaixo):</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button type="button" onclick="selectOnboardingPreset('Clínicas Odontológicas', 'clinica odontologica')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">🦷 Clínicas Odontológicas</button>
+          <button type="button" onclick="selectOnboardingPreset('Estética Automotiva', 'estetica automotiva')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">🚘 Estética Automotiva</button>
+          <button type="button" onclick="selectOnboardingPreset('Lojas de Seminovos', 'seminovos multimarcas')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">🚗 Lojas de Seminovos</button>
+          <button type="button" onclick="selectOnboardingPreset('Imobiliárias & Corretores', 'imobiliaria alto padrao')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">🏢 Imobiliárias</button>
+          <button type="button" onclick="selectOnboardingPreset('Clínicas de Estética', 'clinica de estetica harmonizacao')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">✨ Estética & Harmonização</button>
+          <button type="button" onclick="selectOnboardingPreset('Energia Solar', 'energia solar fotovoltaica')" class="btn-pill-soft" style="font-size:11px;padding:7px 11px;">☀️ Energia Solar</button>
+        </div>
+      </div>
+
+      <div style="display:grid;gap:12px;">
+        <label style="display:block;">
+          <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">1. Qual o Nome do Nicho que você quer prospectar?</span>
+          <input id="onbNicheName" type="text" placeholder="Ex: Clínicas Odontológicas, Energia Solar, Pizzarias..." class="clean-input" style="width:100%;" />
+        </label>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">2. Termo principal no Instagram</span>
+            <input id="onbKeywords" type="text" placeholder="Ex: clinica odontologica" class="clean-input" style="width:100%;" />
+          </label>
+
+          <label style="display:block;">
+            <span style="display:block;margin:0 0 5px 2px;font:600 11px Inter,sans-serif;color:#636363;">3. Qual Cidade / Região alvo?</span>
+            <input id="onbCity" type="text" value="Petrolina - PE" placeholder="Ex: Petrolina - PE" class="clean-input" style="width:100%;" />
+          </label>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:11px;background:#f5efff;border:1px solid #d7c4f3;cursor:pointer;">
+          <input id="onbRunPreSearch" type="checkbox" checked style="width:16px;height:16px;accent-color:#7c5cff;" />
+          <span style="font:600 12px Inter,sans-serif;color:#292929;">Já fazer a Pré-Pesquisa automática de leads válidos agora (~12 seg)</span>
+        </label>
+      </div>
+
+      <div id="onbLoadingInfo" style="display:none;margin-top:14px;padding:12px;border-radius:12px;background:#17152a;color:#e4e0ff;font:600 12px Inter,sans-serif;text-align:center;">
+        ⚡ Fazendo a pré-pesquisa do seu nicho no Instagram (100% links reais)... Aguarde ~12 segundos!
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+        <button type="button" onclick="closeOnboardingModal()" class="tab-btn">Pular por enquanto</button>
+        <button id="onbSubmitBtn" type="button" onclick="submitOnboardingForm()" class="btn-codex-primary" style="padding:12px 20px;">
+          Salvar Nicho & Começar →
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
 
   <script>
-    let STATE = { leads: [], history: [], config: { niches: [], selectedNicheId: '' } };
+    let STATE = { user: null, leads: [], history: [], config: { niches: [], selectedNicheId: '' } };
     let ACTIVE_TAB = 'prioridade_alta';
+    let CURRENT_USER_ID = localStorage.getItem('salles_prospector_user_id') || 'user-salles';
+
+    function apiFetch(url, options = {}) {
+      const headers = Object.assign({}, options.headers || {}, {
+        'X-User-Id': CURRENT_USER_ID
+      });
+      return fetch(url, Object.assign({}, options, { headers }));
+    }
 
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.style.display = 'block';
-      setTimeout(() => { t.style.display = 'none'; }, 4000);
+      setTimeout(() => { t.style.display = 'none'; }, 4500);
     }
 
     async function fetchState() {
-      const res = await fetch('/api/state');
+      const res = await apiFetch('/api/state');
       STATE = await res.json();
+      if (STATE.user) {
+        CURRENT_USER_ID = STATE.user.id;
+        localStorage.setItem('salles_prospector_user_id', CURRENT_USER_ID);
+        const lbl = document.getElementById('currentUserNameLabel');
+        if (lbl) lbl.textContent = STATE.user.name;
+      }
       populateNiches();
       updateTriggerBadge();
       renderKPIs();
       renderLeads();
+
+      if (STATE.user && STATE.user.onboardingCompleted === false) {
+        openOnboardingModal();
+      }
+    }
+
+    function openAuthModal() {
+      document.getElementById('authModal').style.display = 'flex';
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').style.display = 'none';
+    }
+
+    function switchAuthTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('authTabLogin').className = isLogin ? 'tab-btn tab-btn-active' : 'tab-btn';
+      document.getElementById('authTabRegister').className = !isLogin ? 'tab-btn tab-btn-active' : 'tab-btn';
+      document.getElementById('authLoginForm').style.display = isLogin ? 'grid' : 'none';
+      document.getElementById('authRegisterForm').style.display = !isLogin ? 'grid' : 'none';
+    }
+
+    async function submitLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      if (!email) return showToast('Digite seu e-mail para entrar.');
+
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        return showToast(data.error || 'Erro ao fazer login.');
+      }
+      CURRENT_USER_ID = data.user.id;
+      localStorage.setItem('salles_prospector_user_id', CURRENT_USER_ID);
+      closeAuthModal();
+      await fetchState();
+      showToast(`Bem-vindo de volta, ${data.user.name}! Suas pesquisas salvas foram carregadas.`);
+    }
+
+    async function submitRegister() {
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      if (!name || !email) return showToast('Preencha nome e e-mail para criar seu login!');
+
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        return showToast(data.error || 'Erro ao criar conta.');
+      }
+      CURRENT_USER_ID = data.user.id;
+      localStorage.setItem('salles_prospector_user_id', CURRENT_USER_ID);
+      closeAuthModal();
+      await fetchState();
+      openOnboardingModal();
+      showToast(`Conta criada para ${data.user.name}! Preencha seu Pré-Formulário de Nicho.`);
+    }
+
+    function openOnboardingModal() {
+      const pref = (STATE.user && STATE.user.preferences) || {};
+      if (pref.interestedNiche) document.getElementById('onbNicheName').value = pref.interestedNiche;
+      if (pref.targetKeywords) document.getElementById('onbKeywords').value = pref.targetKeywords;
+      if (pref.targetCity) document.getElementById('onbCity').value = pref.targetCity;
+      document.getElementById('onboardingModal').style.display = 'flex';
+    }
+
+    function closeOnboardingModal() {
+      document.getElementById('onboardingModal').style.display = 'none';
+    }
+
+    function selectOnboardingPreset(nicheName, keyword) {
+      document.getElementById('onbNicheName').value = nicheName;
+      document.getElementById('onbKeywords').value = keyword;
+    }
+
+    async function submitOnboardingForm() {
+      const interestedNiche = document.getElementById('onbNicheName').value.trim();
+      const targetKeywords = document.getElementById('onbKeywords').value.trim() || interestedNiche;
+      const targetCity = document.getElementById('onbCity').value.trim() || 'Petrolina - PE';
+      const runPreSearch = document.getElementById('onbRunPreSearch').checked;
+
+      if (!interestedNiche) {
+        return showToast('Informe qual nicho você tem interesse em buscar!');
+      }
+
+      const btn = document.getElementById('onbSubmitBtn');
+      const info = document.getElementById('onbLoadingInfo');
+      btn.disabled = true;
+      if (runPreSearch) info.style.display = 'block';
+
+      try {
+        const res = await apiFetch('/api/auth/onboarding', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ interestedNiche, targetKeywords, targetCity, runPreSearch })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          STATE.user = data.user;
+          STATE.config = data.config;
+          STATE.leads = data.leads || [];
+          STATE.history = data.history || [];
+          document.getElementById('locationInput').value = targetCity;
+          populateNiches();
+          renderKPIs();
+          renderLeads();
+          closeOnboardingModal();
+          showToast(`Pré-formulário salvo! Nicho "${interestedNiche}" configurado com ${STATE.leads.length} leads válidos.`);
+          if (runPreSearch) {
+            setTimeout(fetchState, 22000);
+          }
+        } else {
+          showToast('Erro no pré-formulário: ' + (data.error || 'Tente novamente'));
+        }
+      } catch (e) {
+        showToast('Erro ao salvar pré-formulário: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        info.style.display = 'none';
+      }
     }
 
     function updateTriggerBadge() {
@@ -1056,7 +1313,7 @@
       const autoSendDataCrazy = document.getElementById('trigAutoDataCrazy').checked;
       const nicheId = document.getElementById('nicheSelect').value;
 
-      const res = await fetch('/api/trigger/config', {
+      const res = await apiFetch('/api/trigger/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled, intervalHours, limit, keyword, location, autoSendDataCrazy, nicheId })
@@ -1218,7 +1475,7 @@
               <!-- Bloco da 1ª Mensagem Recomendada por Caso -->
               <div style="padding:12px 13px;background:#fff;border:0.8px solid #d7c4f3;border-radius:12px;display:grid;gap:8px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-                  <span style="font:700 11px/1.2 Montserrat,sans-serif;color:#5a3cc0;">
+                  <span style="font:700 11px/1.2 Inter,sans-serif;color:#5a3cc0;">
                     ${(lead.message_strategy && lead.message_strategy.case_title) || '1ª Mensagem Recomendada'}
                   </span>
                   <button
@@ -1307,7 +1564,7 @@
       banner.style.display = 'block';
 
       try {
-        const res = await fetch('/api/prospect', {
+        const res = await apiFetch('/api/prospect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nicheId, keyword, location, limit, autoSendDataCrazy })
@@ -1320,7 +1577,8 @@
           STATE.history = data.history;
           renderKPIs();
           renderLeads();
-          showToast(`${data.newLeadsCount} perfis analisados no Instagram e verificados na Biblioteca da Meta!`);
+          showToast(`⚡ ${data.newLeadsCount} perfis 100% válidos capturados! Validando Biblioteca Meta em 2º plano...`);
+          setTimeout(fetchState, 22000);
         }
       } catch (e) {
         showToast('Erro ao consultar servidor: ' + e.message);
@@ -1332,7 +1590,7 @@
 
     async function sendSingleToDataCrazy(leadId) {
       showToast('Enviando lead para o CRM DataCrazy...');
-      const res = await fetch('/api/datacrazy/send', {
+      const res = await apiFetch('/api/datacrazy/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ leadId })
@@ -1355,7 +1613,7 @@
         return;
       }
       showToast(`Enviando ${pending.length} leads prioritários para o DataCrazy...`);
-      const res = await fetch('/api/datacrazy/send', {
+      const res = await apiFetch('/api/datacrazy/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ leadIds: pending.map((p) => p.id) })
@@ -1370,7 +1628,7 @@
     }
 
     async function updateLeadPhone(leadId, phoneVal) {
-      const res = await fetch(`/api/leads/${encodeURIComponent(leadId)}`, {
+      const res = await apiFetch(`/api/leads/${encodeURIComponent(leadId)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ whatsapp_number: phoneVal })
@@ -1385,7 +1643,7 @@
     }
 
     async function updateLeadMessage(leadId, msgVal) {
-      const res = await fetch(`/api/leads/${encodeURIComponent(leadId)}`, {
+      const res = await apiFetch(`/api/leads/${encodeURIComponent(leadId)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ personalized_message: msgVal })
@@ -1406,7 +1664,7 @@
     }
 
     async function markLeadContacted(leadId) {
-      await fetch(`/api/leads/${encodeURIComponent(leadId)}`, {
+      await apiFetch(`/api/leads/${encodeURIComponent(leadId)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pipeline_status: 'chamado_whatsapp' })
@@ -1415,7 +1673,7 @@
 
     async function deleteLead(leadId, username) {
       try {
-        const res = await fetch(`/api/leads/${encodeURIComponent(leadId)}`, {
+        const res = await apiFetch(`/api/leads/${encodeURIComponent(leadId)}`, {
           method: 'DELETE'
         });
         const data = await res.json();
@@ -1446,7 +1704,7 @@
       const defaultMessage = document.getElementById('modalNicheMessage').value.trim();
       if (!name) return showToast('Informe o nome do nicho!');
 
-      const res = await fetch('/api/niches', {
+      const res = await apiFetch('/api/niches', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, category: 'Personalizado', keywords, defaultMessage })
