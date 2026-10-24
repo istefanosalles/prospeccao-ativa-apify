@@ -41,7 +41,9 @@ if (IS_VERCEL && !fs.existsSync(USERS_DB_PATH) && fs.existsSync(SEED_USERS_PATH)
 function loadEnv() {
   const envVars = {
     APIFY_API_TOKEN: process.env.APIFY_API_TOKEN || '',
-    DATACRAZY_WEBHOOK_URL: process.env.DATACRAZY_WEBHOOK_URL || ''
+    DATACRAZY_WEBHOOK_URL: process.env.DATACRAZY_WEBHOOK_URL || '',
+    SUPABASE_URL: process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '',
+    SUPABASE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || ''
   };
   if (fs.existsSync(ENV_PATH)) {
     const lines = fs.readFileSync(ENV_PATH, 'utf-8').split(/\r?\n/);
@@ -49,11 +51,140 @@ function loadEnv() {
       if (!line || line.startsWith('#')) continue;
       const idx = line.indexOf('=');
       if (idx > 0) {
-        envVars[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
+        const k = line.slice(0, idx).trim();
+        const v = line.slice(idx + 1).trim();
+        envVars[k] = v;
       }
     }
   }
+  envVars.SUPABASE_URL = (envVars.SUPABASE_URL || envVars.VITE_SUPABASE_URL || '').replace(/\/$/, '');
+  envVars.SUPABASE_KEY = envVars.SUPABASE_SERVICE_ROLE_KEY || envVars.SUPABASE_ANON_KEY || envVars.SUPABASE_KEY || '';
   return envVars;
+}
+
+function isSupabaseActive() {
+  const env = loadEnv();
+  return Boolean(env.SUPABASE_URL && env.SUPABASE_KEY && env.SUPABASE_URL.startsWith('https://'));
+}
+
+async function syncUsersToSupabase(usersDb) {
+  if (!isSupabaseActive()) return false;
+  const env = loadEnv();
+  try {
+    const rows = (usersDb.users || []).map((u) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      password: u.password || '123',
+      onboarding_completed: Boolean(u.onboardingCompleted),
+      preferences: u.preferences || {},
+      leads: u.leads || [],
+      history: u.history || [],
+      deleted_usernames: u.deletedUsernames || [],
+      config: u.config || {},
+      updated_at: new Date().toISOString()
+    }));
+
+    await fetch(`${env.SUPABASE_URL}/rest/v1/prospector_users?on_conflict=id`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: env.SUPABASE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_KEY}`,
+        Prefer: 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(rows)
+    });
+
+    // Também espelha cada lead individualmente na tabela relacional prospect_leads
+    const allLeadsRows = [];
+    for (const u of usersDb.users || []) {
+      for (const l of u.leads || []) {
+        allLeadsRows.push({
+          id: `${u.id}__${l.id}`,
+          user_id: u.id,
+          niche_id: l.niche_id || 'geral',
+          niche_name: l.niche_name || 'Geral',
+          location: l.location || 'Brasil',
+          username: l.instagram?.username || '',
+          full_name: l.instagram?.full_name || '',
+          profile_url: l.instagram?.profile_url || '',
+          followers_count: Number(l.instagram?.followers_count || 0),
+          biography: l.instagram?.biography || '',
+          external_url: l.instagram?.external_url || '',
+          in_ad_library: Boolean(l.meta_ads?.in_ad_library),
+          active_ads_count: Number(l.meta_ads?.active_ads_count || 0),
+          ad_library_status_label: l.meta_ads?.ad_library_status_label || '',
+          ad_library_url: l.meta_ads?.ad_library_url || '',
+          priority: l.qualification?.priority || 'ALTA',
+          closing_potential: l.qualification?.closing_potential || 'ALTO',
+          closing_score: Number(l.qualification?.closing_score || 0),
+          closing_reason: l.qualification?.closing_reason || '',
+          whatsapp_number: l.contact?.whatsapp_number || '',
+          whatsapp_link: l.contact?.whatsapp_link || '',
+          personalized_message: l.contact?.personalized_message || '',
+          pipeline_status: l.pipeline_status || 'novo',
+          updated_at: new Date().toISOString()
+        });
+      }
+    }
+
+    if (allLeadsRows.length > 0) {
+      await fetch(`${env.SUPABASE_URL}/rest/v1/prospect_leads?on_conflict=id`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: env.SUPABASE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_KEY}`,
+          Prefer: 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(allLeadsRows)
+      });
+    }
+    return true;
+  } catch (err) {
+    console.warn('Aviso ao sincronizar com Supabase:', err.message);
+    return false;
+  }
+}
+
+let LAST_SUPABASE_PULL = 0;
+async function pullUsersFromSupabaseIfConfigured(force = false) {
+  if (!isSupabaseActive()) return;
+  if (!force && Date.now() - LAST_SUPABASE_PULL < 4000) return;
+  LAST_SUPABASE_PULL = Date.now();
+  const env = loadEnv();
+  try {
+    const resp = await fetch(`${env.SUPABASE_URL}/rest/v1/prospector_users?select=*&order=created_at.asc`, {
+      headers: {
+        apikey: env.SUPABASE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_KEY}`
+      }
+    });
+    if (!resp.ok) return;
+    const rows = await resp.json();
+    if (Array.isArray(rows) && rows.length > 0) {
+      const users = rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        email: r.email,
+        password: r.password || '123',
+        onboardingCompleted: Boolean(r.onboarding_completed),
+        preferences: r.preferences || {},
+        leads: Array.isArray(r.leads) ? r.leads : [],
+        history: Array.isArray(r.history) ? r.history : [],
+        deletedUsernames: Array.isArray(r.deleted_usernames) ? r.deleted_usernames : [],
+        config: r.config || loadConfig()
+      }));
+      fs.writeFileSync(USERS_DB_PATH, JSON.stringify({ users }, null, 2), 'utf-8');
+    } else if (Array.isArray(rows) && rows.length === 0) {
+      // Banco recém-criado no Supabase: envia a carga inicial
+      const localDb = loadUsersDb();
+      await syncUsersToSupabase(localDb);
+    }
+  } catch (err) {
+    console.warn('Aviso ao ler do Supabase:', err.message);
+  }
 }
 
 const DEFAULT_NICHES = [
@@ -401,6 +532,7 @@ function loadUsersDb() {
 
 function saveUsersDb(usersDb) {
   fs.writeFileSync(USERS_DB_PATH, JSON.stringify(usersDb, null, 2), 'utf-8');
+  syncUsersToSupabase(usersDb).catch(() => {});
 }
 
 function getUserContext(req, explicitUserId = '') {
@@ -413,6 +545,7 @@ function getUserContext(req, explicitUserId = '') {
   const env = loadEnv();
   user.config = user.config || loadConfig();
   user.config.apifyConnected = Boolean(env.APIFY_API_TOKEN);
+  user.config.supabaseConnected = isSupabaseActive();
   user.config.datacrazyWebhookUrl = user.config.datacrazyWebhookUrl || env.DATACRAZY_WEBHOOK_URL || '';
   user.leads = user.leads || [];
   user.history = user.history || [];
@@ -692,6 +825,11 @@ export async function requestHandler(req, res) {
     }
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
     return res.end('Dashboard sendo inicializado...');
+  }
+
+  // Sincronizar estado mais recente do Supabase PostgreSQL se estiver conectado
+  if (pathname.startsWith('/api/')) {
+    await pullUsersFromSupabaseIfConfigured();
   }
 
   // Autenticação: Login
